@@ -17,7 +17,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
-                .group("v1")
+                .group("v0.1")
                 .pathsToMatch("/api/**")  // Ajuste para incluir apenas os caminhos que começam com /api/
                 .packagesToScan("com.example.demo") // Ajuste para o pacote dos seus RestControllers
                 .addOpenApiMethodFilter(method -> method.getDeclaringClass().isAnnotationPresent(RestController.class))
