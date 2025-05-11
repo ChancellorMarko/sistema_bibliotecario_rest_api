@@ -9,7 +9,11 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
+<<<<<<< Updated upstream
     date = "2025-05-11T13:16:43-0300",
+=======
+    date = "2025-05-09T18:46:09-0300",
+>>>>>>> Stashed changes
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.z20250331-1358, environment: Java 21.0.6 (Eclipse Adoptium)"
 )
 @Component
