@@ -1,7 +1,7 @@
 package com.example.demo.service.Utils;
 
 public class ApiResponse<T> {
-    
+
     private boolean success;
     private T data;
     private ErrorResponse error;

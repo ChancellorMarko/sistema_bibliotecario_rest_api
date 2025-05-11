@@ -7,35 +7,40 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.Entities.Reserva;
+import com.example.demo.dto.ReservaDTO;
+import com.example.demo.mapper.ReservaMapper;
 import com.example.demo.repository.IReservaRepository;
 
 @Service
 public class ReservaService {
-    
     @Autowired
     private IReservaRepository reservaRepository;
 
-    public Reserva salvar(Reserva reserva)
+    @Autowired
+    private ReservaMapper reservaMapper;
+
+    public Optional<ReservaDTO> buscarPorId(Long id)
     {
-        return reservaRepository.save(reserva);
+        return reservaRepository.findById(id).map(reservaMapper::toDTO);
     }
 
-    public Optional<Reserva> buscarPorId(Long id)
-    {
-        return reservaRepository.findById(id);
-    }
-
-    public Reserva atualizar(Long id, Reserva atualizarReserva)
+    public ReservaDTO atualizar(Long id, ReservaDTO reservaDTO)
     {
         Reserva reservaExistente = reservaRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Reserva não encontrada!"));
 
-        reservaExistente.setClienteId(atualizarReserva.getClienteId());
-        reservaExistente.setLivroId(atualizarReserva.getLivroId());
-        reservaExistente.setDataReserva(atualizarReserva.getDataReserva());
-        reservaExistente.setStatus(atualizarReserva.getStatus());
+        reservaExistente.setClienteId(reservaDTO.getClienteId());
+        reservaExistente.setLivroId(reservaDTO.getLivroId());
+        reservaExistente.setDataReserva(reservaDTO.getDataReserva());
+        reservaExistente.setStatus(reservaDTO.getStatus());
 
-        return reservaRepository.save(reservaExistente);
+        return reservaMapper.toDTO(reservaRepository.save(reservaExistente));
+    }
+
+    public ReservaDTO salvar(ReservaDTO reservaDTO)
+    {
+        Reserva reserva = reservaMapper.toEntity(reservaDTO);
+        return reservaMapper.toDTO(reservaRepository.save(reserva));
     }
 
     public void deletar(Long id)
@@ -43,8 +48,8 @@ public class ReservaService {
         reservaRepository.deleteById(id);
     }
 
-    public List<Reserva> listarTodos()
+    public List<ReservaDTO> listarTodos()
     {
-        return reservaRepository.findAll();
+        return reservaMapper.toDTOList(reservaRepository.findAll());
     }
 }

@@ -9,7 +9,6 @@ import com.example.demo.dto.UsuarioDTO;
 
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {
-    
 
     UsuarioDTO toDTO(Usuario usuario);
 
