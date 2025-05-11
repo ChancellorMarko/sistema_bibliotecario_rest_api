@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.Entities.Emprestimo;
+import com.example.demo.dto.EmprestimoDTO;
+import com.example.demo.mapper.EmprestimoMapper;
 import com.example.demo.repository.IEmprestimoRepository;
 
 @Service
@@ -15,27 +17,18 @@ public class EmprestimoService{
     @Autowired
     private IEmprestimoRepository emprestimoRepository;
 
-    public Emprestimo salvar(Emprestimo emprestimo)
+    @Autowired
+    private EmprestimoMapper emprestimoMapper;
+
+    public Optional<EmprestimoDTO> buscarPorId(Long id)
     {
-        return emprestimoRepository.save(emprestimo);
+        return emprestimoRepository.findById(id).map(emprestimoMapper::toDTO);
     }
 
-    public Optional<Emprestimo> buscarPorId(Long id)
+    public EmprestimoDTO salvar(EmprestimoDTO emprestimoDTO)
     {
-        return emprestimoRepository.findById(id);
-    }
-
-    public Emprestimo atualizar(Long id, Emprestimo atualizarEmprestimo)
-    {
-        Emprestimo emprestimoExistente = emprestimoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Emprestimo não encontrado!"));
-
-        emprestimoExistente.setLivroId(atualizarEmprestimo.getLivroId());
-        emprestimoExistente.setDataEmprestimo(atualizarEmprestimo.getDataEmprestimo());
-        emprestimoExistente.setDataDevolucao(atualizarEmprestimo.getDataDevolucao());
-        emprestimoExistente.setStatus(atualizarEmprestimo.getStatus());
-
-        return emprestimoRepository.save(emprestimoExistente);
+        Emprestimo emprestimo = emprestimoMapper.toEntity(emprestimoDTO);
+        return emprestimoMapper.toDTO(emprestimoRepository.save(emprestimo));
     }
 
     public void deletar(Long id)
@@ -43,8 +36,22 @@ public class EmprestimoService{
         emprestimoRepository.deleteById(id);
     }
 
-    public List<Emprestimo> listarTodos()
+    public List<EmprestimoDTO> listarTodos()
     {
-        return emprestimoRepository.findAll();
+        return emprestimoMapper.toDTOList(emprestimoRepository.findAll());
+    }
+
+    public EmprestimoDTO atualizar(Long id, EmprestimoDTO emprestimoDTO)
+    {
+        Emprestimo emprestimoExistente = emprestimoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Empréstimo não encontrado!"));
+
+        emprestimoExistente.setClienteId(emprestimoDTO.getClienteId());
+        emprestimoExistente.setLivroId(emprestimoDTO.getLivroId());
+        emprestimoExistente.setDataDevolucao(emprestimoDTO.getDataDevolucao());
+        emprestimoExistente.setDataEmprestimo(emprestimoDTO.getDataEmprestimo());
+        emprestimoExistente.setStatus(emprestimoDTO.getStatus());
+
+        return emprestimoMapper.toDTO(emprestimoRepository.save(emprestimoExistente));
     }
 }
