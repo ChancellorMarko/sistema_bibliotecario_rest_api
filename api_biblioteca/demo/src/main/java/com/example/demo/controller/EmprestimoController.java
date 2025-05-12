@@ -63,7 +63,7 @@ public class EmprestimoController {
         }
         catch(IllegalArgumentException e)
         {
-            // Cria uma mensagem de erro
+            // Cria um erro com a mensagem específica
             ErrorResponse errorResponse = new ErrorResponse("Argumento inválido", e.getMessage());
             ApiResponse<EmprestimoDTO> response = new ApiResponse<>(errorResponse);
             return ResponseEntity.badRequest().body(response);
@@ -77,7 +77,7 @@ public class EmprestimoController {
         }
     }
 
-    @Operation(summary = "Deleta um empréstimo por id", description = "Cadastra um novo empréstimo no banco de dados")
+    @Operation(summary = "Deleta um empréstimo por id", description = "Deleta um empréstimo no banco de dados")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarEmprestimo(@PathVariable Long id)
     {
