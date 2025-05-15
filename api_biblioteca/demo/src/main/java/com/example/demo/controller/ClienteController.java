@@ -4,6 +4,7 @@ import com.example.demo.Entities.Cliente;
 import com.example.demo.service.ClienteService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 //import java.util.List;
 import java.util.Optional;
 
+@Tag(name = "Cliente", description = "Endpoints para gerenciamento de clientes")
 @RestController
 @RequestMapping("/api/clientes")
 public class ClienteController {
