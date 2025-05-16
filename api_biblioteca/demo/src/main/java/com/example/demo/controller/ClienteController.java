@@ -72,7 +72,7 @@ public class ClienteController {
         return ResponseEntity.noContent().build();
     }
 
-    // (opcional) Listar todos (deixe comentado se não for usar)
+    // (opcional) Listar todos (deixei comentado, vou ver se vou usar ainda)
     /*
     @GetMapping
     public ResponseEntity<List<ClienteDTO>> listarTodos() {
