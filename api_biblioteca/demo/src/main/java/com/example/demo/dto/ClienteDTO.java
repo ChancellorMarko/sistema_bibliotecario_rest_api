@@ -7,31 +7,23 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @NoArgsConstructor
-public class UsuarioDTO {
-    
+public class ClienteDTO {
     private Long id;
 
     @NotBlank(message = "O nome é obrigatório")
+    @Size(max = 100)
     private String nome;
 
-    @NotBlank(message = "O CPF é obrigatório")
-    @Size(min = 11, max = 11, message = "O CPF deve ter 11 caracteres")
-    private String cpf;
-
-    @Email(message = "E-mail inválido")
     @NotBlank(message = "O e-mail é obrigatório")
+    @Email(message = "E-mail inválido")
     private String email;
-
-    @NotBlank(message = "A senha é obrigatória")
-    @Size(min = 6, message = "A senha deve ter pelo menos 6 caracteres")
-    private String senha;
-
-    private LocalDate dataNascimento;
 
     @NotBlank(message = "O telefone é obrigatório")
     private String telefone;
+
+    @NotBlank(message = "O endereço é obrigatório")
+    private String endereco;
 }
+

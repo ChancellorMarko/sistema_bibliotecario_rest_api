@@ -1,17 +1,30 @@
 package com.example.demo.controller;
 
 import com.example.demo.Entities.Cliente;
+import com.example.demo.dto.ClienteDTO;
+import com.example.demo.mapper.ClienteMapper;
 import com.example.demo.service.ClienteService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-//import java.util.List;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import java.util.Optional;
 
+@Tag(name = "Cliente", description = "Endpoints para gerenciamento de clientes")
 @RestController
 @RequestMapping("/api/clientes")
 public class ClienteController {
@@ -19,29 +32,36 @@ public class ClienteController {
     @Autowired
     private ClienteService clienteService;
 
+    @Autowired
+    private ClienteMapper clienteMapper;
+
     // 1. Criar Cliente
     @PostMapping
     @Operation(summary = "Criar um novo cliente")
-    public ResponseEntity<Cliente> criar(@RequestBody Cliente cliente) {
+    public ResponseEntity<ClienteDTO> criar(@Valid @RequestBody ClienteDTO clienteDTO) {
+        Cliente cliente = clienteMapper.toEntity(clienteDTO);
         Cliente novoCliente = clienteService.salvar(cliente);
-        return ResponseEntity.status(201).body(novoCliente);
+        ClienteDTO resposta = clienteMapper.toDTO(novoCliente);
+        return ResponseEntity.status(201).body(resposta);
     }
 
     // 2. Buscar Cliente por ID
     @GetMapping("/{id}")
     @Operation(summary = "Buscar um cliente por ID")
-    public ResponseEntity<Cliente> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable Long id) {
         Optional<Cliente> cliente = clienteService.buscarPorId(id);
-        return cliente.map(ResponseEntity::ok)
-                      .orElse(ResponseEntity.notFound().build());
+        return cliente
+                .map(c -> ResponseEntity.ok(clienteMapper.toDTO(c)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // 3. Atualizar Cliente
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar os dados de um cliente")
-    public ResponseEntity<Cliente> atualizar(@PathVariable Long id, @RequestBody Cliente clienteAtualizado) {
+    public ResponseEntity<ClienteDTO> atualizar(@PathVariable Long id, @Valid @RequestBody ClienteDTO clienteDTO) {
+        Cliente clienteAtualizado = clienteMapper.toEntity(clienteDTO);
         Cliente cliente = clienteService.atualizar(id, clienteAtualizado);
-        return ResponseEntity.ok(cliente);
+        return ResponseEntity.ok(clienteMapper.toDTO(cliente));
     }
 
     // 4. Excluir Cliente
@@ -52,9 +72,12 @@ public class ClienteController {
         return ResponseEntity.noContent().build();
     }
 
-    // (opcional) Listar todos(Deixar comentado por emquanto)
-    /*@GetMapping
-    public ResponseEntity<List<Cliente>> listarTodos() {
-        return ResponseEntity.ok(clienteService.listarTodos());
-    }*/
+    // (opcional) Listar todos (deixei comentado, vou ver se vou usar ainda)
+    /*
+    @GetMapping
+    public ResponseEntity<List<ClienteDTO>> listarTodos() {
+        List<Cliente> clientes = clienteService.listarTodos();
+        return ResponseEntity.ok(clienteMapper.toDTOList(clientes));
+    }
+    */
 }
