@@ -2,6 +2,9 @@ package com.example.demo.dto;
 
 import java.time.LocalDateTime;
 
+import com.example.demo.Entities.Cliente;
+import com.example.demo.Entities.Livro;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,10 +17,10 @@ public class EmprestimoDTO {
     private Long id;
 
     @NotBlank(message = "O id do cliente é obrigatório")
-    private Long clienteId;
+    private Cliente clienteId;
 
     @NotNull(message = "O id do livro é obrigatório!")
-    private Long livroId;
+    private Livro livroId;
 
     @NotNull(message = "Data de empréstimo não deve estar vazia!")
     private LocalDateTime dataEmprestimo;
