@@ -29,7 +29,7 @@ public class Reserva {
     private Cliente clienteId;
 
     @ManyToOne
-    @JoinColumn(name = "llivro_id", nullable = false)
+    @JoinColumn(name = "livro_id", nullable = false)
     private Livro livroId;
 
     @Column(nullable = false)

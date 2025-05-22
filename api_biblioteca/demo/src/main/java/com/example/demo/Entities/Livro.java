@@ -21,7 +21,7 @@ public class Livro {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long livro_id;
 
     @Column(nullable = false)
     private String titulo;
