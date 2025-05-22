@@ -2,8 +2,6 @@ package com.example.demo.Entities;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.ManyToAny;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
