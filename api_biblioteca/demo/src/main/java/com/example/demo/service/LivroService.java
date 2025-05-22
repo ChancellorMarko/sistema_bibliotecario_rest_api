@@ -7,16 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class LivroService {
 
-   @Autowired
+    @Autowired
     private ILivroRepository livroRepository;
 
     public Livro salvar(Livro livro) {
-        return LivroRepository.save(livro);
+        return livroRepository.save(livro);
     }
 
     public List<Livro> buscarTodos() {
@@ -28,7 +27,6 @@ public class LivroService {
                 .orElseThrow(() -> new RuntimeException("Livro não encontrado com ID: " + id));
     }
 
-    
     public Livro atualizar(Long id, Livro novoLivro) {
         Livro existente = buscarPorId(id);
 
@@ -38,11 +36,11 @@ public class LivroService {
         existente.setQuantidade(novoLivro.getQuantidade());
         existente.setCategoria(novoLivro.getCategoria());
 
-        return ILivroRepository.save(existente);
+        return livroRepository.save(existente);
     }
 
     public void deletar(Long id) {
         Livro livro = buscarPorId(id);
-        ILivroRepository.delete(livro);
+        livroRepository.delete(livro);
     }
-} 
+}
