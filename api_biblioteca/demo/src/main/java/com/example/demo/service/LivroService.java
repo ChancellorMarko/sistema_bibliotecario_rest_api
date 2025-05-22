@@ -16,14 +16,13 @@ public class LivroService {
     private ILivroRepository livroRepository;
 
     public Livro salvar(Livro livro) {
-        return ILivroRepository.save(livro Entities);
+        return LivroRepository.save(livro);
     }
 
     public List<Livro> buscarTodos() {
         return livroRepository.findAll();
     }
 
-    // Buscar por ID
     public Livro buscarPorId(Long id) {
         return livroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Livro não encontrado com ID: " + id));
@@ -42,11 +41,8 @@ public class LivroService {
         return ILivroRepository.save(existente);
     }
 
-    // Deletar livro
     public void deletar(Long id) {
         Livro livro = buscarPorId(id);
         ILivroRepository.delete(livro);
     }
-}  
-    
-}
+} 
