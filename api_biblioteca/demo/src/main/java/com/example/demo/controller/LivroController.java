@@ -20,7 +20,7 @@ public class LivroController {
     @Autowired
     private LivroMapper livroMapper;
 
-     @PostMapping
+    @PostMapping
     public ResponseEntity<LivroDTO> criarLivro(@RequestBody LivroDTO livroDTO) {
         var livro = livroMapper.toEntity(livroDTO);
         var livroSalvo = livroService.salvar(livro);
