@@ -36,4 +36,7 @@ public class Cliente {
 
     @Column(nullable = false)
     private String endereco;
+
+    @Column(nullable = false, unique = true) 
+    private String documento;
 }
