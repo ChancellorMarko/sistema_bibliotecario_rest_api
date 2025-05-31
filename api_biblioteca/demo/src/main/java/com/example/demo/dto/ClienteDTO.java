@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ClienteDTO {
-    private Long cliente_id;
+    private Long id;
 
     @NotBlank(message = "O nome é obrigatório")
     @Size(max = 100)

@@ -42,4 +42,15 @@ public class ApiResponse<T> {
     public void setError(ErrorResponse error) {
         this.error = error;
     }
+
+    // Adicionando métodos que ajudam no retorno de respostas
+    public static <T> ApiResponse<T> success(T data)
+    {
+        return new ApiResponse<>(data);
+    }
+
+    public static <T> ApiResponse<T> error(String errorType, String errorMessage)
+    {
+        return new ApiResponse<>(new ErrorResponse(errorType, errorMessage));
+    }
 }
