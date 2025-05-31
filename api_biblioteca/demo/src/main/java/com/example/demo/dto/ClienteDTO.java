@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ClienteDTO {
-    private Long cliente_id;
+    private Long id;
 
     @NotBlank(message = "O nome é obrigatório")
     @Size(max = 100)
@@ -25,5 +25,9 @@ public class ClienteDTO {
 
     @NotBlank(message = "O endereço é obrigatório")
     private String endereco;
+
+    @NotBlank(message = "O documento é obrigatório")
+    @Size(min = 11, max = 14, message = "Documento deve ter entre 11 e 14 caracteres")
+    private String documento;
 }
 

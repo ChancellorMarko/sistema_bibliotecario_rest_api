@@ -2,11 +2,9 @@ package com.example.demo.dto;
 
 import java.time.LocalDateTime;
 
-import com.example.demo.Entities.Cliente;
-import com.example.demo.Entities.Livro;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,10 +15,10 @@ public class EmprestimoDTO {
     private Long id;
 
     @NotBlank(message = "O id do cliente é obrigatório")
-    private Cliente clienteId;
+    private Long clienteId;
 
     @NotNull(message = "O id do livro é obrigatório!")
-    private Livro livroId;
+    private Long livroId;
 
     @NotNull(message = "Data de empréstimo não deve estar vazia!")
     private LocalDateTime dataEmprestimo;
@@ -29,6 +27,7 @@ public class EmprestimoDTO {
     private LocalDateTime dataDevolucao;
 
     @NotBlank(message = "O status da reserva é obrigatório!")
-    @Size(max = 50, message = "A descrição de status deve ter no máximo 50 caracteres")
+    @Size(max = 20, message = "A descrição de status deve ter no máximo 20 caracteres")
+    @Pattern(regexp = "EM_ANDAMENTO|CONCLUIDO|ATRASADO", message = "Status deve ser EM_ANDAMENTO, CONCLUIDO ou ATRASADO")
     private String status;
 }

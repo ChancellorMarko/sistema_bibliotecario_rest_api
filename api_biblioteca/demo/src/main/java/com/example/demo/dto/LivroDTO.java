@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class LivroDTO {
-    private Long livro_id;
+    private Long id;
 
     @NotBlank(message = "O título é obrigatório")
     @Size(max = 100, message = "O título deve ter no máximo 100 caracteres")

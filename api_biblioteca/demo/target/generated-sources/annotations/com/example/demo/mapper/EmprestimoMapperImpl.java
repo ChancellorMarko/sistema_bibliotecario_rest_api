@@ -1,6 +1,8 @@
 package com.example.demo.mapper;
 
+import com.example.demo.Entities.Cliente;
 import com.example.demo.Entities.Emprestimo;
+import com.example.demo.Entities.Livro;
 import com.example.demo.dto.EmprestimoDTO;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-31T16:28:32-0300",
+    date = "2025-05-31T16:29:30-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.v20250514-1000, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
@@ -23,11 +25,11 @@ public class EmprestimoMapperImpl implements EmprestimoMapper {
 
         EmprestimoDTO emprestimoDTO = new EmprestimoDTO();
 
-        emprestimoDTO.setClienteId( emprestimo.getClienteId() );
+        emprestimoDTO.setClienteId( emprestimoClienteId( emprestimo ) );
+        emprestimoDTO.setLivroId( emprestimoLivroId( emprestimo ) );
         emprestimoDTO.setDataDevolucao( emprestimo.getDataDevolucao() );
         emprestimoDTO.setDataEmprestimo( emprestimo.getDataEmprestimo() );
         emprestimoDTO.setId( emprestimo.getId() );
-        emprestimoDTO.setLivroId( emprestimo.getLivroId() );
         emprestimoDTO.setStatus( emprestimo.getStatus() );
 
         return emprestimoDTO;
@@ -41,11 +43,8 @@ public class EmprestimoMapperImpl implements EmprestimoMapper {
 
         Emprestimo emprestimo = new Emprestimo();
 
-        emprestimo.setClienteId( emprestimoDTO.getClienteId() );
         emprestimo.setDataDevolucao( emprestimoDTO.getDataDevolucao() );
-        emprestimo.setDataEmprestimo( emprestimoDTO.getDataEmprestimo() );
         emprestimo.setId( emprestimoDTO.getId() );
-        emprestimo.setLivroId( emprestimoDTO.getLivroId() );
         emprestimo.setStatus( emprestimoDTO.getStatus() );
 
         return emprestimo;
@@ -63,5 +62,35 @@ public class EmprestimoMapperImpl implements EmprestimoMapper {
         }
 
         return list;
+    }
+
+    private Long emprestimoClienteId(Emprestimo emprestimo) {
+        if ( emprestimo == null ) {
+            return null;
+        }
+        Cliente cliente = emprestimo.getCliente();
+        if ( cliente == null ) {
+            return null;
+        }
+        Long id = cliente.getId();
+        if ( id == null ) {
+            return null;
+        }
+        return id;
+    }
+
+    private Long emprestimoLivroId(Emprestimo emprestimo) {
+        if ( emprestimo == null ) {
+            return null;
+        }
+        Livro livro = emprestimo.getLivro();
+        if ( livro == null ) {
+            return null;
+        }
+        Long id = livro.getId();
+        if ( id == null ) {
+            return null;
+        }
+        return id;
     }
 }

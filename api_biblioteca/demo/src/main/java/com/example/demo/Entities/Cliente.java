@@ -23,7 +23,7 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cliente_id;
+    private Long id;
 
     @Column(nullable = false)
     private String nome;
@@ -36,4 +36,7 @@ public class Cliente {
 
     @Column(nullable = false)
     private String endereco;
+
+    @Column(nullable = false, unique = true) 
+    private String documento;
 }

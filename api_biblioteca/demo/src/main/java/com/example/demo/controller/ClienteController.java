@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.Optional;
+
 
 @Tag(name = "Cliente", description = "Endpoints para gerenciamento de clientes")
 @RestController
@@ -47,13 +47,11 @@ public class ClienteController {
 
     // 2. Buscar Cliente por ID
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar um cliente por ID")
-    public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable Long id) {
-        Optional<Cliente> cliente = clienteService.buscarPorId(id);
-        return cliente
-                .map(c -> ResponseEntity.ok(clienteMapper.toDTO(c)))
-                .orElse(ResponseEntity.notFound().build());
-    }
+@Operation(summary = "Buscar um cliente por ID")
+public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable Long id) {
+    Cliente cliente = clienteService.buscarPorId(id); // Agora recebe Cliente direto, não Optional
+    return ResponseEntity.ok(clienteMapper.toDTO(cliente));
+}
 
     // 3. Atualizar Cliente
     @PutMapping("/{id}")
