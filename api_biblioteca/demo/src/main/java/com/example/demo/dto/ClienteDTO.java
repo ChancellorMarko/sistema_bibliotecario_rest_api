@@ -25,5 +25,9 @@ public class ClienteDTO {
 
     @NotBlank(message = "O endereço é obrigatório")
     private String endereco;
+
+    @NotBlank(message = "O documento é obrigatório")
+    @Size(min = 11, max = 14, message = "Documento deve ter entre 11 e 14 caracteres")
+    private String documento;
 }
 
