@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class LivroDTO {
 
 
-    private Long livro_id;
+    private Long id;
 
 
     @NotBlank(message = "O título é obrigatório")

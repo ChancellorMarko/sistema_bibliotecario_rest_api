@@ -17,7 +17,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
-                .group("v0.1")
+                .group("v0.2")
                 .pathsToMatch("/api/**")  // Ajuste para incluir apenas os caminhos que começam com /api/
                 .packagesToScan("com.example.demo") // Ajuste para o pacote dos seus RestControllers
                 .addOpenApiMethodFilter(method -> method.getDeclaringClass().isAnnotationPresent(RestController.class))
@@ -28,7 +28,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
     public OpenApiCustomizer customOpenApi() {
         return openApi -> {
             openApi.getInfo().setTitle("Sistema Bibliotecário"); // Renomeia o título
-            openApi.getInfo().setVersion("1.0.0"); // Define a versão
+            openApi.getInfo().setVersion("0.0.2"); // Define a versão
             openApi.getInfo().setDescription("API de gerenciamento bibliotecário."); // Define a descrição
         };
     }
