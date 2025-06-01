@@ -1,5 +1,7 @@
+
 package com.example.demo.Entities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -26,16 +28,16 @@ public class Multa {
     private Long id;
 
     @Column(nullable = false)
-    private Long clienteId;
+    private Long emprestimoId;
 
     @Column(nullable = false)
-    private Long livroId;
+    private BigDecimal valor;
 
     @Column(nullable = false)
-    private LocalDateTime dataMulta;
+    private String status;
 
     @Column(nullable = false)
-    private double valorMulta;
+    private LocalDateTime dataPagamento;
 
 }
 
