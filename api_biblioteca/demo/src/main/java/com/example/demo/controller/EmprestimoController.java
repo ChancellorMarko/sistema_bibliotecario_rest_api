@@ -101,7 +101,7 @@ public class EmprestimoController {
     }
 
     // Listar todos empréstimos por cliente
-    @Operation(summary = "Lista todos empréstimos", description = "Lista todos os empréstimos feitos pelo cliente presentes no banco de dados")
+    @Operation(summary = "Lista todos empréstimos por cliente", description = "Lista todos os empréstimos feitos pelo cliente presentes no banco de dados")
     @GetMapping("/cliente/{clienteId}")
     public ResponseEntity<ApiResponse<List<EmprestimoDTO>>> emprestimosPorCliente(@PathVariable long clienteId)
     {

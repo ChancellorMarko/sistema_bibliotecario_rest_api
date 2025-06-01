@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +54,9 @@ public class EmprestimoService{
         Emprestimo emprestimo = emprestimoMapper.toEntity(emprestimoDTO);
         emprestimo.setCliente(cliente);
         emprestimo.setLivro(livro);
+
+        // Definir a data do empréstimo como a data/hora atual
+        emprestimo.setDataEmprestimo(LocalDateTime.now());
 
         // Diminui um a cada empréstimo feito por livro
         livro.setQuantidade(livro.getQuantidade() - 1);

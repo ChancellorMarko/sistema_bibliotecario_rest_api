@@ -26,15 +26,15 @@ public class Reserva {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
-    private Cliente clienteId;
+    private Cliente cliente;
 
     @ManyToOne
     @JoinColumn(name = "livro_id", nullable = false)
-    private Livro livroId;
+    private Livro livro;
 
     @Column(nullable = false)
     private LocalDateTime dataReserva;
 
-    @Column(nullable = false)
+    @Column
     private String status;
 }

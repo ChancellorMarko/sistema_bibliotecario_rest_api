@@ -1,13 +1,14 @@
 package com.example.demo.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.demo.dto.ReservaDTO;
 import com.example.demo.service.ReservaService;
@@ -15,7 +16,6 @@ import com.example.demo.service.Utils.ApiResponse;
 import com.example.demo.service.Utils.ErrorResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -32,24 +32,28 @@ public class ReservaController {
     @Autowired
     private ReservaService reservaService;
 
+    // Listar todas
     @Operation(summary = "Lista todos as reservas", description = "Retorna uma lista com todas as reservas já cadastrados")
     @GetMapping
-    public ResponseEntity<List<ReservaDTO>> listarReservas()
+    public ResponseEntity<ApiResponse<List<ReservaDTO>>> listarReservas()
     {
-        List<ReservaDTO> reservas = reservaService.listarTodos();
-        return ResponseEntity.ok(reservas);
+        List<ReservaDTO> reservas = reservaService.listarTodas();
+        return ResponseEntity.ok(new ApiResponse<>(reservas));
     }
 
+    // Buscar por id
     @Operation(summary = "Busca uma reserva por id", description = "Retorna uma reserva cadastrada")
     @GetMapping("/{id}")
-    public ResponseEntity<ReservaDTO> buscarPorid(@PathVariable Long id)
+    public ResponseEntity<ApiResponse<ReservaDTO>> buscarPorid(@PathVariable Long id)
     {
-        Optional<ReservaDTO> reservaDTO  =reservaService.buscarPorId(id);
-        return reservaDTO.map(ResponseEntity::ok)
-                        .orElseGet(() -> ResponseEntity.notFound().build());
+        ReservaDTO reservaDTO = reservaService.buscarPorId(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Reserva não encontrada"));
+
+        return ResponseEntity.ok(new ApiResponse<>(reservaDTO));
     }
 
-    @Operation(summary = "Cria uam nova reserva", description = "Cadastra uma nova reserva no banco de dados")
+    // Criar nova reserva
+    @Operation(summary = "Cria uma nova reserva", description = "Cadastra uma nova reserva no banco de dados")
     @PostMapping
     public ResponseEntity<ApiResponse<ReservaDTO>> criarReserva(@Valid @RequestBody ReservaDTO reservaDTO)
     {

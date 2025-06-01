@@ -26,7 +26,7 @@ public class EmprestimoDTO {
     @NotNull(message = "Data de devolução não deve estar vazia!")
     private LocalDateTime dataDevolucao;
 
-    @NotBlank(message = "O status da reserva é obrigatório!")
+    @NotBlank(message = "O status do empréstimo é obrigatório!")
     @Size(max = 20, message = "A descrição de status deve ter no máximo 20 caracteres")
     @Pattern(regexp = "EM_ANDAMENTO|CONCLUIDO|ATRASADO", message = "Status deve ser EM_ANDAMENTO, CONCLUIDO ou ATRASADO")
     private String status;
