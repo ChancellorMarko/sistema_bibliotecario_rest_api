@@ -4,6 +4,8 @@ import com.example.demo.Entities.Cliente;
 import com.example.demo.dto.ClienteDTO;
 import com.example.demo.mapper.ClienteMapper;
 import com.example.demo.service.ClienteService;
+import com.example.demo.service.Utils.ApiResponse;
+import com.example.demo.service.Utils.ErrorResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,17 +14,9 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-
-
+import java.util.List;
 
 @Tag(name = "Cliente", description = "Endpoints para gerenciamento de clientes")
 @RestController
@@ -35,47 +29,65 @@ public class ClienteController {
     @Autowired
     private ClienteMapper clienteMapper;
 
-    // 1. Criar Cliente
+    // Criar um novo cliente
     @PostMapping
     @Operation(summary = "Criar um novo cliente")
-    public ResponseEntity<ClienteDTO> criar(@Valid @RequestBody ClienteDTO clienteDTO) {
+    public ResponseEntity<ApiResponse<String>> criar(@Valid @RequestBody ClienteDTO clienteDTO) {
         Cliente cliente = clienteMapper.toEntity(clienteDTO);
-        Cliente novoCliente = clienteService.salvar(cliente);
-        ClienteDTO resposta = clienteMapper.toDTO(novoCliente);
-        return ResponseEntity.status(201).body(resposta);
+        clienteService.salvar(cliente);
+        return ResponseEntity.status(201).body(ApiResponse.success("Cliente criado com sucesso!"));
     }
 
-    // 2. Buscar Cliente por ID
+    // Buscar cliente por ID
     @GetMapping("/{id}")
-@Operation(summary = "Buscar um cliente por ID")
-public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable Long id) {
-    Cliente cliente = clienteService.buscarPorId(id); // Agora recebe Cliente direto, não Optional
-    return ResponseEntity.ok(clienteMapper.toDTO(cliente));
-}
+    @Operation(summary = "Buscar um cliente por ID")
+    public ResponseEntity<ApiResponse<?>> buscarPorId(@PathVariable Long id) {
+        try {
+            Cliente cliente = clienteService.buscarPorId(id);
+            ClienteDTO dto = clienteMapper.toDTO(cliente);
+            return ResponseEntity.ok(ApiResponse.success(dto));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404)
+                    .body(ApiResponse.error("NotFoundException", e.getMessage()));
+        }
+    }
 
-    // 3. Atualizar Cliente
+    // Atualizar cliente
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar os dados de um cliente")
-    public ResponseEntity<ClienteDTO> atualizar(@PathVariable Long id, @Valid @RequestBody ClienteDTO clienteDTO) {
-        Cliente clienteAtualizado = clienteMapper.toEntity(clienteDTO);
-        Cliente cliente = clienteService.atualizar(id, clienteAtualizado);
-        return ResponseEntity.ok(clienteMapper.toDTO(cliente));
+    public ResponseEntity<ApiResponse<?>> atualizar(@PathVariable Long id, @Valid @RequestBody ClienteDTO clienteDTO) {
+        try {
+            Cliente clienteAtualizado = clienteMapper.toEntity(clienteDTO);
+            Cliente cliente = clienteService.atualizar(id, clienteAtualizado);
+            ClienteDTO dto = clienteMapper.toDTO(cliente);
+            return ResponseEntity.ok(ApiResponse.success(dto));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404)
+                    .body(ApiResponse.error("NotFoundException", e.getMessage()));
+        }
     }
 
-    // 4. Excluir Cliente
+    // Deletar cliente
     @DeleteMapping("/{id}")
     @Operation(summary = "Excluir um cliente")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        clienteService.deletar(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ApiResponse<String>> deletar(@PathVariable Long id) {
+        try {
+            clienteService.deletar(id);
+            return ResponseEntity.ok(ApiResponse.success("Cliente excluído com sucesso!"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404)
+                    .body(ApiResponse.error("NotFoundException", e.getMessage()));
+        }
     }
 
-    // (opcional) Listar todos (deixei comentado, vou ver se vou usar ainda)
+    // (Opcional) Listar todos os clientes
     /*
     @GetMapping
-    public ResponseEntity<List<ClienteDTO>> listarTodos() {
+    @Operation(summary = "Listar todos os clientes")
+    public ResponseEntity<ApiResponse<List<ClienteDTO>>> listarTodos() {
         List<Cliente> clientes = clienteService.listarTodos();
-        return ResponseEntity.ok(clienteMapper.toDTOList(clientes));
+        List<ClienteDTO> dtos = clienteMapper.toDTOList(clientes);
+        return ResponseEntity.ok(ApiResponse.success(dtos));
     }
     */
 }
