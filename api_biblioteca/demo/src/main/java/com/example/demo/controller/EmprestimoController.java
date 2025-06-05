@@ -96,8 +96,17 @@ public class EmprestimoController {
     @PatchMapping("/{id}/devolver")
     public ResponseEntity<ApiResponse<EmprestimoDTO>> fazerDevolucao(@PathVariable Long id)
     {
-        EmprestimoDTO emprestimo = emprestimoService.registrarDevolucao(id);
-        return ResponseEntity.ok(ApiResponse.success(emprestimo));
+        try
+        {
+            EmprestimoDTO emprestimo = emprestimoService.registrarDevolucao(id);
+            return ResponseEntity.ok(ApiResponse.success(emprestimo));
+        }
+        catch(IllegalStateException e)
+        {
+            // Caso o livro já tenha sido devolvido
+            ErrorResponse errorResponse = new ErrorResponse("Operação não permitida", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse<>(errorResponse));
+        }
     }
 
     // Listar todos empréstimos por cliente

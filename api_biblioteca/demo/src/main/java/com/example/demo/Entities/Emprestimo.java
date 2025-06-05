@@ -38,6 +38,6 @@ public class Emprestimo {
     @Column(nullable = false)
     private LocalDateTime dataDevolucao;
 
-    @Column
+    @Column(nullable = false)
     private String status;
 }

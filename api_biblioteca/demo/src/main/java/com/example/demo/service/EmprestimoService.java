@@ -119,6 +119,11 @@ public class EmprestimoService{
         Emprestimo emprestimo = emprestimoRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado"));
 
+        // Verificar se o empréstimo já foi devolvido
+        if ("CONCLUIDO".equals(emprestimo.getStatus())) {
+            throw new IllegalStateException("Este livro já foi devolvido anteriormente");
+        }
+
         // Faz a liberação do livro
         Livro livro = emprestimo.getLivro();
         livro.setQuantidade(livro.getQuantidade() + 1);
