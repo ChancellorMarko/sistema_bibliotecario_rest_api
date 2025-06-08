@@ -14,8 +14,19 @@ async function criarReserva(event) {
   const reservaData = {
     clienteId: Number.parseInt(formData.get("clienteId")),
     livroId: Number.parseInt(formData.get("livroId")),
-    dataReserva: formData.get("dataReserva"),
+    dataReserva: new Date(formData.get("dataReserva")).toISOString(),
     status: formData.get("status"),
+  }
+
+  // Validar dados antes de enviar
+  if (!reservaData.clienteId || !reservaData.livroId || !reservaData.dataReserva || !reservaData.status) {
+    showAlert("Todos os campos são obrigatórios!", "error")
+    return
+  }
+
+  if (isNaN(reservaData.clienteId) || isNaN(reservaData.livroId)) {
+    showAlert("IDs do cliente e livro devem ser números válidos!", "error")
+    return
   }
 
   try {

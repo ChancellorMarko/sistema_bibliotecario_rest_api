@@ -5,103 +5,174 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas - Sistema de Biblioteca</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/reservas.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <h1>📚 Sistema de Biblioteca</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="Clientes.html">Clientes</a></li>
-                <li><a href="Livros.html">Livros</a></li>
-                <li><a href="Emprestimos.html">Empréstimos</a></li>
-                <li><a href="Reserva.html" class="active">Reservas</a></li>
-                <li><a href="Multa.html">Multas</a></li>
-            </ul>
-        </nav>
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-book-open"></i>
+                <h1>Sistema de Biblioteca</h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="Clientes.html"><i class="fas fa-users"></i> Clientes</a></li>
+                    <li><a href="Livros.html"><i class="fas fa-book"></i> Livros</a></li>
+                    <li><a href="Emprestimos.html"><i class="fas fa-handshake"></i> Empréstimos</a></li>
+                    <li><a href="Reserva.html" class="active"><i class="fas fa-calendar-check"></i> Reservas</a></li>
+                    <li><a href="Multa.html"><i class="fas fa-exclamation-triangle"></i> Multas</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
 
-    <main>
-        <div class="container">
-            <h2>📅 Gerenciamento de Reservas</h2>
-            
-            <!-- Formulário para nova reserva -->
-            <form id="reservaForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="clienteId">ID do Cliente *</label>
-                        <input type="number" id="clienteId" name="clienteId" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="livroId">ID do Livro *</label>
-                        <input type="number" id="livroId" name="livroId" required>
-                    </div>
+    <main class="main-content">
+        <div class="page-header">
+            <div class="container">
+                <div class="page-title">
+                    <i class="fas fa-calendar-check"></i>
+                    <h2>Gerenciamento de Reservas</h2>
                 </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="dataReserva">Data da Reserva *</label>
-                        <input type="date" id="dataReserva" name="dataReserva" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="status">Status</label>
-                        <select id="status" name="status">
-                            <option value="ATIVA">Ativa</option>
-                            <option value="CANCELADA">Cancelada</option>
-                            <option value="CONCLUIDA">Concluída</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Criar Reserva</button>
-                </div>
-            </form>
+                <p class="page-subtitle">Gerencie as reservas de livros da biblioteca</p>
+            </div>
         </div>
+
+        <!-- Formulário para nova reserva -->
+        <section class="form-section">
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-plus-circle"></i> Nova Reserva</h3>
+                        <p>Preencha os dados para criar uma nova reserva</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="reservaForm" class="reservation-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="clienteId">
+                                        <i class="fas fa-user"></i>
+                                        ID do Cliente *
+                                    </label>
+                                    <input type="number" id="clienteId" name="clienteId" required placeholder="Digite o ID do cliente">
+                                </div>
+                                <div class="form-group">
+                                    <label for="livroId">
+                                        <i class="fas fa-book"></i>
+                                        ID do Livro *
+                                    </label>
+                                    <input type="number" id="livroId" name="livroId" required placeholder="Digite o ID do livro">
+                                </div>
+                                <div class="form-group">
+                                    <label for="dataReserva">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Data da Reserva *
+                                    </label>
+                                    <input type="date" id="dataReserva" name="dataReserva" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="status">
+                                        <i class="fas fa-info-circle"></i>
+                                        Status
+                                    </label>
+                                    <select id="status" name="status">
+                                        <option value="ATIVA">Ativa</option>
+                                        <option value="CANCELADA">Cancelada</option>
+                                        <option value="CONCLUIDA">Concluída</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Criar Reserva
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Ações de consulta -->
-        <div class="container">
-            <h3>🔍 Consultar Reservas</h3>
-            <div class="action-buttons">
-                <button type="button" class="btn btn-info" onclick="listarTodasReservas()">Todas as Reservas</button>
-            </div>
-            
-            <div class="form-row" style="margin-top: 1rem;">
-                <div class="form-group">
-                    <label for="buscarReservaId">Buscar por ID</label>
-                    <input type="number" id="buscarReservaId" placeholder="ID da reserva">
+        <section class="search-section">
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-search"></i> Consultar Reservas</h3>
+                        <p>Busque e visualize as reservas existentes</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="search-actions">
+                            <button type="button" class="btn btn-info" onclick="listarTodasReservas()">
+                                <i class="fas fa-list"></i>
+                                Todas as Reservas
+                            </button>
+                        </div>
+                        
+                        <div class="search-form">
+                            <div class="search-group">
+                                <label for="buscarReservaId">
+                                    <i class="fas fa-search"></i>
+                                    Buscar por ID
+                                </label>
+                                <div class="search-input-group">
+                                    <input type="number" id="buscarReservaId" placeholder="Digite o ID da reserva">
+                                    <button type="button" class="btn btn-secondary" onclick="buscarReserva()">
+                                        <i class="fas fa-search"></i>
+                                        Buscar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <button type="button" class="btn btn-secondary" onclick="buscarReserva()">Buscar</button>
-                </div>
             </div>
-        </div>
+        </section>
 
         <!-- Lista de reservas -->
-        <div id="listaReservas" class="container" style="display: none;">
-            <h3>📅 Lista de Reservas</h3>
-            <div class="table-container">
-                <table id="tabelaReservas">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Cliente ID</th>
-                            <th>Livro ID</th>
-                            <th>Data Reserva</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+        <section id="listaReservas" class="results-section" style="display: none;">
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-check"></i> Lista de Reservas</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-wrapper">
+                            <table id="tabelaReservas" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-hashtag"></i> ID</th>
+                                        <th><i class="fas fa-user"></i> Cliente ID</th>
+                                        <th><i class="fas fa-book"></i> Livro ID</th>
+                                        <th><i class="fas fa-calendar"></i> Data Reserva</th>
+                                        <th><i class="fas fa-info-circle"></i> Status</th>
+                                        <th><i class="fas fa-cogs"></i> Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
 
         <!-- Resultado da busca individual -->
-        <div id="resultadoBusca" class="container" style="display: none;">
-            <h3>📋 Dados da Reserva</h3>
-            <div id="dadosReserva"></div>
-        </div>
+        <section id="resultadoBusca" class="results-section" style="display: none;">
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-file-alt"></i> Dados da Reserva</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="dadosReserva" class="reservation-details"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <script src="../js/config.js"></script>
