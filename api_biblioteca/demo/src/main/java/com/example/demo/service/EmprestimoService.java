@@ -41,29 +41,36 @@ public class EmprestimoService{
     }
 
     // Método para salvar
-    public EmprestimoDTO salvar(EmprestimoDTO emprestimoDTO)
-    {
-        // Buscando pelo cliente
-        Cliente cliente = clienteRepository.findById(emprestimoDTO.getClienteId())
-            .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
+    // Método para salvar
+   public EmprestimoDTO salvar(EmprestimoDTO emprestimoDTO) {
+    // Buscando pelo cliente
+    Cliente cliente = clienteRepository.findById(emprestimoDTO.getClienteId())
+        .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
 
-        //Buscando pelo livro
-        Livro livro = livroRepository.findById(emprestimoDTO.getLivroId())
-            .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
+    // Buscando pelo livro
+    Livro livro = livroRepository.findById(emprestimoDTO.getLivroId())
+        .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado"));
 
-        Emprestimo emprestimo = emprestimoMapper.toEntity(emprestimoDTO);
-        emprestimo.setCliente(cliente);
-        emprestimo.setLivro(livro);
+    // Convertendo o DTO para a entidade
+    Emprestimo emprestimo = emprestimoMapper.toEntity(emprestimoDTO);
+    emprestimo.setCliente(cliente);
+    emprestimo.setLivro(livro);
 
-        // Definir a data do empréstimo como a data/hora atual
-        emprestimo.setDataEmprestimo(LocalDateTime.now());
-
-        // Diminui um a cada empréstimo feito por livro
-        livro.setQuantidade(livro.getQuantidade() - 1);
-        livroRepository.save(livro);
-
-        return emprestimoMapper.toDTO(emprestimoRepository.save(emprestimo));
+    // Definir status padrão se não vier preenchido
+    if (emprestimo.getStatus() == null || emprestimo.getStatus().isBlank()) {
+        emprestimo.setStatus("EM_ANDAMENTO");
     }
+
+    // Definir a data do empréstimo como a data/hora atual
+    emprestimo.setDataEmprestimo(LocalDateTime.now());
+
+    // Reduzir quantidade do livro
+    livro.setQuantidade(livro.getQuantidade() - 1);
+    livroRepository.save(livro);
+
+    // Salvar empréstimo e retornar DTO
+    return emprestimoMapper.toDTO(emprestimoRepository.save(emprestimo));
+}
 
     // Deleta um empréstimo
     public void deletar(Long id)
