@@ -1,0 +1,43 @@
+/* Status styling */
+.status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.875rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status-ativo {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-devolvido {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.status-atrasado {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-cancelada {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-concluida {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-paga {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-pendente {
+  background-color: #fff3cd;
+  color: #856404;
+}

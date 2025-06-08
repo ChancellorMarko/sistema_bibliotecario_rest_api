@@ -81,7 +81,7 @@ public class ClienteController {
     }
 
     // (Opcional) Listar todos os clientes
-    /*
+    
     @GetMapping
     @Operation(summary = "Listar todos os clientes")
     public ResponseEntity<ApiResponse<List<ClienteDTO>>> listarTodos() {
@@ -89,5 +89,5 @@ public class ClienteController {
         List<ClienteDTO> dtos = clienteMapper.toDTOList(clientes);
         return ResponseEntity.ok(ApiResponse.success(dtos));
     }
-    */
+    
 }

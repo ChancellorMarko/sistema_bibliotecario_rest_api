@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Biblioteca - MeAjuda</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <header>
+        <h1>📚 Sistema de Biblioteca - MeAjuda</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="Clientes.html">Clientes</a></li>
+                <li><a href="Livros.html">Livros</a></li>
+                <li><a href="Emprestimos.html">Empréstimos</a></li>
+                <li><a href="Reserva.html">Reservas</a></li>
+                <li><a href="Multa.html">Multas</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="dashboard">
+            <h2>Dashboard do Sistema</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card" onclick="window.location.href='Livros.html'">
+                    <h3>📖 Livros</h3>
+                    <p class="stat-number loading" id="totalLivros">-</p>
+                    <p>Total no acervo</p>
+                </div>
+                
+                <div class="stat-card" onclick="window.location.href='Clientes.html'">
+                    <h3>👥 Clientes</h3>
+                    <p class="stat-number loading" id="totalClientes">-</p>
+                    <p>Cadastrados</p>
+                </div>
+                
+                <div class="stat-card" onclick="window.location.href='Emprestimos.html'">
+                    <h3>📋 Empréstimos</h3>
+                    <p class="stat-number loading" id="totalEmprestimos">-</p>
+                    <p>Ativos</p>
+                </div>
+                
+                <div class="stat-card" onclick="window.location.href='Emprestimos.html?filter=atrasados'">
+                    <h3>⚠️ Atrasados</h3>
+                    <p class="stat-number loading" id="totalAtrasados">-</p>
+                    <p>Empréstimos</p>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <h3>Ações Rápidas</h3>
+                <div class="action-buttons">
+                    <a href="Clientes.html" class="btn btn-primary">👤 Novo Cliente</a>
+                    <a href="Livros.html" class="btn btn-secondary">📕 Novo Livro</a>
+                    <a href="Emprestimos.html" class="btn btn-success">📝 Novo Empréstimo</a>
+                    <a href="Reserva.html" class="btn btn-info">🔖 Nova Reserva</a>
+                </div>
+            </div>
+            
+            <div class="recent-activities">
+                <h3>Últimas Atividades</h3>
+                <ul class="activity-list" id="activityList">
+                    <li class="activity-item">
+                        <div class="activity-icon icon-loan">📚</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Carregando atividades recentes...</div>
+                            <div class="activity-time">Aguarde um momento</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <div id="alertContainer" class="alert-container"></div>
+
+    <!-- APENAS o dashboard.js - SEM config.js -->
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

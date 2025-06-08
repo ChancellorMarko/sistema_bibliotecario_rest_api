@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livros - Sistema de Biblioteca</title>
+    <link rel="stylesheet" href="../css/livros.css">
+</head>
+<body>
+    <header>
+        <h1>📚 Sistema de Biblioteca - MeAjuda</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="Clientes.html">Clientes</a></li>
+                <li><a href="Livros.html" class="active">Livros</a></li>
+                <li><a href="Emprestimos.html">Empréstimos</a></li>
+                <li><a href="Reserva.html">Reservas</a></li>
+                <li><a href="Multa.html">Multas</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <h2>📖 Gerenciamento de Livros</h2>
+            
+            <!-- Formulário para cadastro/edição -->
+            <form id="livroForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="titulo">Título *</label>
+                        <input type="text" id="titulo" name="titulo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="autor">Autor *</label>
+                        <input type="text" id="autor" name="autor" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editora">Editora *</label>
+                        <input type="text" id="editora" name="editora" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="anoPublicacao">Ano de Publicação *</label>
+                        <input type="number" id="anoPublicacao" name="anoPublicacao" required min="1000" max="9999">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="isbn">ISBN *</label>
+                        <input type="text" id="isbn" name="isbn" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoria *</label>
+                        <input type="text" id="categoria" name="categoria" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="quantidade">Quantidade *</label>
+                        <input type="number" id="quantidade" name="quantidade" required min="0">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" id="btnSubmit">Cadastrar Livro</button>
+                    <button type="button" class="btn btn-secondary" id="btnCancelar" onclick="limparFormulario()" style="display: none;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Buscar livro -->
+        <div class="container">
+            <h3>🔍 Buscar Livro</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="buscarId">ID do Livro</label>
+                    <input type="number" id="buscarId" placeholder="Digite o ID do livro">
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-info" onclick="buscarLivro()">Buscar</button>
+                    <button type="button" class="btn btn-success" onclick="listarTodosLivros()">Listar Todos</button>
+                    <button type="button" class="btn btn-warning" onclick="listarLivrosDisponiveis()">Apenas Disponíveis</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de livros -->
+        <div id="listaLivros" class="container" style="display: none;">
+            <h3>📚 Lista de Livros</h3>
+            <div id="livrosContainer"></div>
+        </div>
+
+        <!-- Resultado da busca individual -->
+        <div id="resultadoBusca" class="container" style="display: none;">
+            <h3>📋 Dados do Livro</h3>
+            <div id="dadosLivro"></div>
+        </div>
+    </main>
+
+    <script>
+        // Configuração da API
+        const API_BASE_URL = 'http://localhost:8080/api';
+        const API_ENDPOINTS = {
+            livros: `${API_BASE_URL}/livros`
+        };
+        
+        let livroEditando = null;
+
+        // Função para exibir alertas
+        function showAlert(message, type) {
+            alert(`${type.toUpperCase()}: ${message}`);
+        }
+
+        // Função para fazer requisições à API
+        async function apiRequest(url, options = {}) {
+            try {
+                console.log(`Fazendo requisição para: ${url}`);
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...options.headers
+                    }
+                });
+                
+                console.log(`Status da resposta: ${response.status}`);
+                
+                const data = await response.json();
+                console.log("Dados recebidos:", data);
+                
+                return { success: response.ok, data: data, status: response.status };
+            } catch (error) {
+                console.error("Erro na requisição:", error);
+                return { 
+                    success: false, 
+                    error: { message: "Erro ao comunicar com o servidor" }
+                };
+            }
+        }
+
+        // Função para tratar respostas da API
+        function handleApiResponse(response, successMessage = null) {
+            if (response.success) {
+                // Verificar se é uma ApiResponse
+                if (response.data && response.data.success !== undefined) {
+                    if (response.data.success) {
+                        if (successMessage) {
+                            showAlert(successMessage, "success");
+                        }
+                        return response.data.data; // Retorna os dados reais
+                    } else {
+                        const errorMsg = response.data.error?.message || "Ocorreu um erro!";
+                        showAlert(errorMsg, "error");
+                        return null;
+                    }
+                } else {
+                    // Resposta direta
+                    if (successMessage) {
+                        showAlert(successMessage, "success");
+                    }
+                    return response.data;
+                }
+            } else {
+                const errorMsg = response.error?.message || "Erro de conexão!";
+                showAlert(errorMsg, "error");
+                return null;
+            }
+        }
+
+        // Evento de carregamento da página
+        document.addEventListener("DOMContentLoaded", () => {
+            // Submit do formulário
+            document.getElementById("livroForm").addEventListener("submit", salvarLivro);
+            
+            // Carregar lista inicial
+            listarTodosLivros();
+        });
+
+        // Função para salvar/atualizar livro
+        async function salvarLivro(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const livroData = {
+                titulo: formData.get("titulo"),
+                autor: formData.get("autor"),
+                editora: formData.get("editora"),
+                anoPublicacao: parseInt(formData.get("anoPublicacao")),
+                isbn: formData.get("isbn"),
+                categoria: formData.get("categoria"),
+                quantidade: parseInt(formData.get("quantidade"))
+            };
+            
+            console.log("Dados do livro a serem enviados:", livroData);
+            
+            try {
+                let response;
+                if (livroEditando) {
+                    // Atualizar livro existente
+                    response = await apiRequest(`${API_ENDPOINTS.livros}/${livroEditando}`, {
+                        method: "PUT",
+                        body: JSON.stringify(livroData)
+                    });
+                } else {
+                    // Criar novo livro
+                    response = await apiRequest(API_ENDPOINTS.livros, {
+                        method: "POST",
+                        body: JSON.stringify(livroData)
+                    });
+                }
+                
+                const result = handleApiResponse(response, livroEditando ? "Livro atualizado com sucesso!" : "Livro cadastrado com sucesso!");
+                
+                if (result !== null) {
+                    limparFormulario();
+                    listarTodosLivros(); // Recarregar lista
+                }
+            } catch (error) {
+                console.error("Erro ao salvar livro:", error);
+                showAlert("Erro de conexão com o servidor", "error");
+            }
+        }
+
+        // Função para buscar livro por ID
+        async function buscarLivro() {
+            const id = document.getElementById("buscarId").value;
+            
+            if (!id) {
+                showAlert("Digite o ID do livro", "error");
+                return;
+            }
+            
+            try {
+                const response = await apiRequest(`${API_ENDPOINTS.livros}/${id}`);
+                const livro = handleApiResponse(response);
+                
+                if (livro) {
+                    exibirDadosLivro(livro);
+                    document.getElementById("listaLivros").style.display = "none";
+                } else {
+                    document.getElementById("resultadoBusca").style.display = "none";
+                }
+            } catch (error) {
+                console.error("Erro ao buscar livro:", error);
+                showAlert("Erro de conexão com o servidor", "error");
+                document.getElementById("resultadoBusca").style.display = "none";
+            }
+        }
+
+        // Função para listar todos os livros
+        async function listarTodosLivros() {
+            try {
+                const response = await apiRequest(API_ENDPOINTS.livros);
+                const livros = handleApiResponse(response);
+                
+                if (livros && Array.isArray(livros)) {
+                    exibirListaLivros(livros, "Todos os Livros");
+                    document.getElementById("resultadoBusca").style.display = "none";
+                } else {
+                    console.error("Resposta não é um array:", livros);
+                    showAlert("Erro ao carregar lista de livros", "error");
+                }
+            } catch (error) {
+                console.error("Erro ao listar livros:", error);
+                showAlert("Erro de conexão com o servidor", "error");
+            }
+        }
+
+        // Função para listar apenas livros disponíveis
+        async function listarLivrosDisponiveis() {
+            try {
+                const response = await apiRequest(`${API_ENDPOINTS.livros}/disponiveis`);
+                const livros = handleApiResponse(response);
+                
+                if (livros && Array.isArray(livros)) {
+                    exibirListaLivros(livros, "Livros Disponíveis");
+                    document.getElementById("resultadoBusca").style.display = "none";
+                } else {
+                    showAlert("Nenhum livro disponível encontrado", "info");
+                }
+            } catch (error) {
+                console.error("Erro ao listar livros disponíveis:", error);
+                showAlert("Erro ao carregar livros disponíveis", "error");
+            }
+        }
+
+        // Função para exibir lista de livros
+        function exibirListaLivros(livros, titulo) {
+            const container = document.getElementById("listaLivros");
+            const livrosContainer = document.getElementById("livrosContainer");
+            
+            // Limpar container
+            livrosContainer.innerHTML = "";
+            
+            // Atualizar título
+            container.querySelector("h3").textContent = `📚 ${titulo} (${livros.length})`;
+            
+            // Preencher container com cards de livros
+            livros.forEach(livro => {
+                const card = document.createElement("div");
+                card.className = "livro-card";
+                
+                card.innerHTML = `
+                    <h4>${livro.titulo} <small>(ID: ${livro.id})</small></h4>
+                    <div class="livro-info">
+                        <p><strong>Autor:</strong> ${livro.autor}</p>
+                        <p><strong>Editora:</strong> ${livro.editora}</p>
+                        <p><strong>Ano:</strong> ${livro.anoPublicacao}</p>
+                        <p><strong>ISBN:</strong> ${livro.isbn}</p>
+                        <p><strong>Categoria:</strong> ${livro.categoria}</p>
+                        <p><strong>Quantidade:</strong> ${livro.quantidade}</p>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-warning btn-sm" onclick="editarLivro(${livro.id})">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirLivro(${livro.id})">Excluir</button>
+                    </div>
+                `;
+                
+                livrosContainer.appendChild(card);
+            });
+            
+            container.style.display = "block";
+        }
+
+        // Função para exibir dados de um livro específico
+        function exibirDadosLivro(livro) {
+            const container = document.getElementById("dadosLivro");
+            
+            container.innerHTML = `
+                <div class="livro-card">
+                    <h4>${livro.titulo}</h4>
+                    <div class="livro-info">
+                        <p><strong>ID:</strong> ${livro.id}</p>
+                        <p><strong>Autor:</strong> ${livro.autor}</p>
+                        <p><strong>Editora:</strong> ${livro.editora}</p>
+                        <p><strong>Ano:</strong> ${livro.anoPublicacao}</p>
+                        <p><strong>ISBN:</strong> ${livro.isbn}</p>
+                        <p><strong>Categoria:</strong> ${livro.categoria}</p>
+                        <p><strong>Quantidade:</strong> ${livro.quantidade}</p>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-warning btn-sm" onclick="editarLivro(${livro.id})">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirLivro(${livro.id})">Excluir</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById("resultadoBusca").style.display = "block";
+        }
+
+        // Função para editar livro
+        function editarLivro(id) {
+            buscarLivroParaEdicao(id);
+        }
+
+        // Função para buscar livro para edição
+        async function buscarLivroParaEdicao(id) {
+            try {
+                const response = await apiRequest(`${API_ENDPOINTS.livros}/${id}`);
+                const livro = handleApiResponse(response);
+                
+                if (livro) {
+                    // Preencher formulário
+                    document.getElementById("titulo").value = livro.titulo;
+                    document.getElementById("autor").value = livro.autor;
+                    document.getElementById("editora").value = livro.editora;
+                    document.getElementById("anoPublicacao").value = livro.anoPublicacao;
+                    document.getElementById("isbn").value = livro.isbn;
+                    document.getElementById("categoria").value = livro.categoria;
+                    document.getElementById("quantidade").value = livro.quantidade;
+                    
+                    // Alterar estado do formulário para edição
+                    livroEditando = id;
+                    document.getElementById("btnSubmit").textContent = "Atualizar Livro";
+                    document.getElementById("btnCancelar").style.display = "inline-block";
+                    
+                    // Scroll para o formulário
+                    document.getElementById("livroForm").scrollIntoView({ behavior: "smooth" });
+                }
+            } catch (error) {
+                console.error("Erro ao buscar livro para edição:", error);
+                showAlert("Erro ao carregar dados do livro", "error");
+            }
+        }
+
+        // Função para excluir livro
+        async function excluirLivro(id) {
+            if (!confirm("Tem certeza que deseja excluir este livro?")) {
+                return;
+            }
+            
+            try {
+                const response = await apiRequest(`${API_ENDPOINTS.livros}/${id}`, {
+                    method: "DELETE"
+                });
+                
+                const result = handleApiResponse(response, "Livro excluído com sucesso!");
+                
+                if (result !== null) {
+                    listarTodosLivros(); // Recarregar lista
+                    
+                    // Limpar busca individual se for o mesmo livro
+                    if (document.getElementById("resultadoBusca").style.display !== "none") {
+                        document.getElementById("resultadoBusca").style.display = "none";
+                    }
+                    
+                    document.getElementById("buscarId").value = "";
+                }
+            } catch (error) {
+                console.error("Erro ao excluir livro:", error);
+                showAlert("Erro de conexão com o servidor", "error");
+            }
+        }
+
+        // Função para limpar formulário
+        function limparFormulario() {
+            document.getElementById("livroForm").reset();
+            livroEditando = null;
+            document.getElementById("btnSubmit").textContent = "Cadastrar Livro";
+            document.getElementById("btnCancelar").style.display = "none";
+        }
+    </script>
+</body>
+</html>

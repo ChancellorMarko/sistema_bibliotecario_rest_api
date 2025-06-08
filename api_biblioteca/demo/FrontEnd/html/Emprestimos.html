@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empréstimos - Sistema de Biblioteca</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <h1>📚 Sistema de Biblioteca - MeAjuda</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="Clientes.html">Clientes</a></li>
+                <li><a href="Livros.html">Livros</a></li>
+                <li><a href="Emprestimos.html" class="active">Empréstimos</a></li>
+                <li><a href="Reserva.html">Reservas</a></li>
+                <li><a href="Multa.html">Multas</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <h2>📋 Gerenciamento de Empréstimos</h2>
+            
+            <!-- Formulário para novo empréstimo -->
+            <form id="emprestimoForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clienteId">ID do Cliente *</label>
+                        <input type="number" id="clienteId" name="clienteId" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="livroId">ID do Livro *</label>
+                        <input type="number" id="livroId" name="livroId" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dataEmprestimo">Data do Empréstimo *</label>
+                        <input type="date" id="dataEmprestimo" name="dataEmprestimo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataPrevistaDevolucao">Data Prevista para Devolução *</label>
+                        <input type="date" id="dataPrevistaDevolucao" name="dataPrevistaDevolucao" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Criar Empréstimo</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Ações de consulta -->
+        <div class="container">
+            <h3>🔍 Consultar Empréstimos</h3>
+            <div class="action-buttons">
+                <button type="button" class="btn btn-info" onclick="listarTodosEmprestimos()">Todos os Empréstimos</button>
+                <button type="button" class="btn btn-warning" onclick="listarEmprestimosAtrasados()">Empréstimos Atrasados</button>
+            </div>
+            
+            <div class="form-row" style="margin-top: 1rem;">
+                <div class="form-group">
+                    <label for="buscarEmprestimoId">Buscar por ID</label>
+                    <input type="number" id="buscarEmprestimoId" placeholder="ID do empréstimo">
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-secondary" onclick="buscarEmprestimo()">Buscar</button>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="buscarClienteId">Empréstimos por Cliente</label>
+                    <input type="number" id="buscarClienteId" placeholder="ID do cliente">
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-success" onclick="buscarEmprestimosPorCliente()">Buscar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de empréstimos -->
+        <div id="listaEmprestimos" class="container" style="display: none;">
+            <h3>📋 Lista de Empréstimos</h3>
+            <div class="table-container">
+                <table id="tabelaEmprestimos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente ID</th>
+                            <th>Livro ID</th>
+                            <th>Data Empréstimo</th>
+                            <th>Data Prevista</th>
+                            <th>Data Devolução</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Resultado da busca individual -->
+        <div id="resultadoBusca" class="container" style="display: none;">
+            <h3>📋 Dados do Empréstimo</h3>
+            <div id="dadosEmprestimo"></div>
+        </div>
+    </main>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/emprestimos.js"></script>
+</body>
+</html>
