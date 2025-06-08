@@ -1,5 +1,7 @@
 let multaEditando = null
 
+// Remove a declaração duplicada - usa a variável global do config.js
+
 document.addEventListener("DOMContentLoaded", () => {
   // Definir data padrão como 30 dias a partir de hoje
   const dataVencimento = new Date()
@@ -27,13 +29,13 @@ async function salvarMulta(event) {
     let response
     if (multaEditando) {
       // Atualizar multa existente
-      response = await apiRequest(`${API_ENDPOINTS.multas}/${multaEditando}`, {
+      response = await apiRequest(`${API_BASE_URL}/api/multas/${multaEditando}`, {
         method: "PUT",
         body: JSON.stringify(multaData),
       })
     } else {
       // Criar nova multa
-      response = await apiRequest(API_ENDPOINTS.multas, {
+      response = await apiRequest(`${API_BASE_URL}/api/multas`, {
         method: "POST",
         body: JSON.stringify(multaData),
       })
@@ -56,7 +58,7 @@ async function salvarMulta(event) {
 
 async function listarTodasMultas() {
   try {
-    const response = await apiRequest(API_ENDPOINTS.multas)
+    const response = await apiRequest(`${API_BASE_URL}/api/multas`)
 
     if (response && Array.isArray(response)) {
       exibirListaMultas(response, "Todas as Multas")
@@ -79,7 +81,7 @@ async function buscarMulta() {
   }
 
   try {
-    const response = await apiRequest(`${API_ENDPOINTS.multas}/${id}`)
+    const response = await apiRequest(`${API_BASE_URL}/api/multas/${id}`)
 
     if (response) {
       exibirDadosMulta(response)
@@ -156,7 +158,7 @@ function editarMulta(id) {
 
 async function buscarMultaParaEdicao(id) {
   try {
-    const response = await apiRequest(`${API_ENDPOINTS.multas}/${id}`)
+    const response = await apiRequest(`${API_BASE_URL}/api/multas/${id}`)
 
     if (response) {
       const multa = response
@@ -189,7 +191,7 @@ async function excluirMulta(id) {
   }
 
   try {
-    const response = await fetch(`${API_ENDPOINTS.multas}/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/api/multas/${id}`, {
       method: "DELETE",
     })
 
@@ -239,4 +241,93 @@ function limparFormulario() {
   const dataVencimento = new Date()
   dataVencimento.setDate(dataVencimento.getDate() + 30)
   document.getElementById("dataVencimento").value = dataVencimento.toISOString().split("T")[0]
+}
+
+// Funções auxiliares (simulações, ajuste conforme necessário)
+async function apiRequest(url, options = {}) {
+  // Simulação de chamada à API (substitua pela lógica real)
+  console.log("API Request:", url, options)
+  const method = options.method || "GET"
+
+  // Simulação de diferentes respostas
+  if (url.includes("/api/multas/1") && method === "GET") {
+    return {
+      id: 1,
+      clienteId: 123,
+      emprestimoId: 456,
+      valor: 50.0,
+      dataVencimento: "2024-03-15",
+      status: "PENDENTE",
+      motivo: "Atraso na devolução",
+    }
+  }
+
+  if (url.includes("/api/multas") && method === "GET" && !url.includes("/api/multas/")) {
+    return [
+      {
+        id: 1,
+        clienteId: 123,
+        emprestimoId: 456,
+        valor: 50.0,
+        dataVencimento: "2024-03-15",
+        status: "PENDENTE",
+        motivo: "Atraso na devolução",
+      },
+      {
+        id: 2,
+        clienteId: 789,
+        emprestimoId: 101,
+        valor: 25.5,
+        dataVencimento: "2024-03-20",
+        status: "PAGA",
+        motivo: null,
+      },
+    ]
+  }
+
+  if (url.includes("/api/multas") && method === "POST") {
+    return {
+      id: 3,
+      clienteId: 112,
+      emprestimoId: 131,
+      valor: 100.0,
+      dataVencimento: "2024-04-20",
+      status: "PENDENTE",
+      motivo: "Livro danificado",
+    }
+  }
+
+  if (url.includes("/api/multas/1") && method === "PUT") {
+    return {
+      id: 1,
+      clienteId: 999,
+      emprestimoId: 888,
+      valor: 75.0,
+      dataVencimento: "2024-03-15",
+      status: "PAGA",
+      motivo: "Atraso na devolução",
+    }
+  }
+
+  if (url.includes("/api/multas/1") && method === "DELETE") {
+    return {}
+  }
+
+  return null
+}
+
+function showAlert(message, type) {
+  // Simulação de alerta (substitua pela lógica real)
+  alert(`${type.toUpperCase()}: ${message}`)
+}
+
+function formatCurrency(value) {
+  // Simulação de formatação de moeda (substitua pela lógica real)
+  return `R$ ${value.toFixed(2)}`
+}
+
+function formatDate(dateString) {
+  // Simulação de formatação de data (substitua pela lógica real)
+  const date = new Date(dateString)
+  return date.toLocaleDateString("pt-BR")
 }
