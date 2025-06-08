@@ -5,7 +5,6 @@ import com.example.demo.dto.ClienteDTO;
 import com.example.demo.mapper.ClienteMapper;
 import com.example.demo.service.ClienteService;
 import com.example.demo.service.Utils.ApiResponse;
-import com.example.demo.service.Utils.ErrorResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
