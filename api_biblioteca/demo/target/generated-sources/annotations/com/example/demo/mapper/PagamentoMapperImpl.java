@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-06-08T19:35:23-0300",
+    date = "2025-06-08T21:42:15-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.v20250514-1000, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
@@ -28,8 +28,12 @@ public class PagamentoMapperImpl implements PagamentoMapper {
         pagamentoDTO.setDataPagamento( pagamento.getDataPagamento() );
         pagamentoDTO.setFormaPagamento( pagamento.getFormaPagamento() );
         pagamentoDTO.setId( pagamento.getId() );
+        pagamentoDTO.setMetodoPagamento( pagamento.getMetodoPagamento() );
+        pagamentoDTO.setMultaId( pagamento.getMultaId() );
+        pagamentoDTO.setObservacoes( pagamento.getObservacoes() );
         pagamentoDTO.setStatus( pagamento.getStatus() );
         pagamentoDTO.setValor( pagamento.getValor() );
+        pagamentoDTO.setValorPago( pagamento.getValorPago() );
 
         return pagamentoDTO;
     }
@@ -46,8 +50,12 @@ public class PagamentoMapperImpl implements PagamentoMapper {
         pagamento.setDataPagamento( pagamentoDTO.getDataPagamento() );
         pagamento.setFormaPagamento( pagamentoDTO.getFormaPagamento() );
         pagamento.setId( pagamentoDTO.getId() );
+        pagamento.setMetodoPagamento( pagamentoDTO.getMetodoPagamento() );
+        pagamento.setMultaId( pagamentoDTO.getMultaId() );
+        pagamento.setObservacoes( pagamentoDTO.getObservacoes() );
         pagamento.setStatus( pagamentoDTO.getStatus() );
         pagamento.setValor( pagamentoDTO.getValor() );
+        pagamento.setValorPago( pagamentoDTO.getValorPago() );
 
         return pagamento;
     }

@@ -16,18 +16,41 @@ public class Pagamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double valor;
+    @Column(name = "multa_id")
+    private Long multaId;
 
-    @Column(nullable = false)
-    private String formaPagamento; // Ex: PIX, Dinheiro, Cartão
+    @Column(name = "valor_pago", nullable = false)
+    private Double valorPago;
 
-    @Column(nullable = false)
-    private String status; // Pendente, Pago, Cancelado
-
-    @Column(nullable = false)
+    @Column(name = "data_pagamento", nullable = false)
     private LocalDateTime dataPagamento;
+
+    @Column(name = "metodo_pagamento", nullable = false)
+    private String metodoPagamento; // PIX, DINHEIRO, CARTAO_CREDITO, etc.
+
+    @Column(nullable = false)
+    private String status; // PENDENTE, PROCESSADO, CANCELADO
+
+    private String observacoes;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
+
+    // Para compatibilidade com o código existente
+    public Double getValor() {
+        return valorPago;
+    }
+
+    public void setValor(Double valor) {
+        this.valorPago = valor;
+    }
+
+    public String getFormaPagamento() {
+        return metodoPagamento;
+    }
+
+    public void setFormaPagamento(String formaPagamento) {
+        this.metodoPagamento = formaPagamento;
+    }
 }
