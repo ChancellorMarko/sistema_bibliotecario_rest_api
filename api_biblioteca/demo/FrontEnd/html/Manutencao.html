@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manutenção - Sistema de Biblioteca</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/reservas.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-book-open"></i>
+                <h1>Sistema de Biblioteca</h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="Clientes.html"><i class="fas fa-users"></i> Clientes</a></li>
+                    <li><a href="Livros.html"><i class="fas fa-book"></i> Livros</a></li>
+                    <li><a href="Emprestimos.html"><i class="fas fa-handshake"></i> Empréstimos</a></li>
+                    <li><a href="Reserva.html"><i class="fas fa-calendar-check"></i> Reservas</a></li>
+                    <li><a href="Multa.html"><i class="fas fa-exclamation-triangle"></i> Multas</a></li>
+                    <li><a href="Pagamentos.html"><i class="fas fa-money-bill-wave"></i> Pagamentos</a></li>
+                    <li><a href="Manutencao.html" class="active"><i class="fas fa-tools"></i> Manutenção</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="page-header">
+            <div class="container">
+                <div class="page-title">
+                    <i class="fas fa-tools"></i>
+                    <h2>Registrar Manutenção</h2>
+                </div>
+                <p class="page-subtitle">Registre os serviços e acompanhe o status</p>
+            </div>
+        </div>
+
+        <section class="form-section">
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-plus-circle"></i> Nova Manutenção</h3>
+                        <p>Preencha os dados abaixo</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="manutencaoForm" class="reservation-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="livroId"><i class="fas fa-book"></i> Livro *</label>
+                                    <select id="livroId" required>
+                                        <option value="">Selecione um livro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="status"><i class="fas fa-info-circle"></i> Status *</label>
+                                    <select id="status" required>
+                                        <option value="">Selecione o status</option>
+                                        <option value="Em andamento">Em andamento</option>
+                                        <option value="Pendente">Pendente</option>
+                                        <option value="Concluída">Concluída</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="dataInicio"><i class="fas fa-calendar-alt"></i> Data de Início *</label>
+                                    <input type="datetime-local" id="dataInicio" required>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="descricao"><i class="fas fa-comment-dots"></i> Descrição *</label>
+                                    <textarea id="descricao" required placeholder="Descreva o problema ou serviço"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Registrar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="search-section">
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-search"></i> Buscar Manutenção</h3>
+                        <p>Filtre pelas opções disponíveis</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="search-actions">
+                            <button class="btn btn-info" onclick="listarTodasManutencoes()">
+                                <i class="fas fa-list"></i> Todas Manutenções
+                            </button>
+                        </div>
+                        <div class="search-form">
+                            <div class="search-group">
+                                <label for="buscarLivroId"><i class="fas fa-book"></i> Buscar por Livro:</label>
+                                <div class="search-input-group">
+                                    <select id="buscarLivroId">
+                                        <option value="">Todos os livros</option>
+                                    </select>
+                                    <button type="button" class="btn btn-secondary" onclick="buscarPorLivro()">
+                                        <i class="fas fa-search"></i> Buscar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filtroStatus"><i class="fas fa-info-circle"></i> Filtrar por Status:</label>
+                                <select id="filtroStatus" onchange="filtrarPorStatus()">
+                                    <option value="">Todos</option>
+                                    <option value="Em andamento">Em andamento</option>
+                                    <option value="Pendente">Pendente</option>
+                                    <option value="Concluída">Concluída</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="listaManutencoes" class="results-section">
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-list"></i> Lista de Manutenções</h3>
+                    </div>
+                    <div class="card-body" id="resultados">
+                        <p>Carregando manutenções...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/manutencao.js"></script>
+</body>
+</html>
