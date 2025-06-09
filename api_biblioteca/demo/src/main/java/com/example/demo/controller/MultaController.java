@@ -1,76 +1,87 @@
-
 package com.example.demo.controller;
+
+import com.example.demo.dto.MultaDTO;
+import com.example.demo.service.MultaService;
+import com.example.demo.service.Utils.ApiResponse;
+import com.example.demo.service.Utils.ErrorResponse;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.example.demo.Entities.Multa;
-import com.example.demo.dto.MultaDTO;
-import com.example.demo.mapper.MultaMapper;
-import com.example.demo.service.MultaService;
-
-import io.swagger.v3.oas.annotations.Operation;
-
+@Tag(name = "Multas", description = "Endpoints para gerenciamento de multas")
 @RestController
-@RequestMapping("/api/multa")
+@RequestMapping("/api/multas")
+@RequiredArgsConstructor
 public class MultaController {
 
-    @Autowired
+      @Autowired
     private MultaService multaService;
 
-    @Autowired
-    private MultaMapper multaMapper;
-
-    // 1.Criando a multa
-    @Operation(summary = "Criando multa")
+    // 1. Criar multa
+    @Operation(summary = "Cria uma nova multa")
     @PostMapping
-    public ResponseEntity<MultaDTO> criarMulta(@RequestBody MultaDTO MultaDTO) {
-        var multa = multaMapper.toEntity(MultaDTO);
-        var multaSalva = multaService.salvar(multa);
-        return ResponseEntity.ok(multaMapper.toDTO(multaSalva));
+    public ResponseEntity<ApiResponse<MultaDTO>> criarMulta(@Valid @RequestBody MultaDTO multaDTO) {
+        try {
+            MultaDTO novaMulta = multaService.salvar(multaDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(novaMulta));
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse("Erro ao criar multa", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(error));
+        }
     }
 
-    // 2.Listar as multas
-    @Operation(summary = "Listando todas as multas")
+    // 2. Listar todas as multas
+    @Operation(summary = "Lista todas as multas")
     @GetMapping
-    public ResponseEntity<List<MultaDTO>> listarMultas() {
-        var multas = multaService.buscarTodos();
-        return ResponseEntity.ok(multaMapper.toDTOList(multas));
+    public ResponseEntity<ApiResponse<List<MultaDTO>>> listarMultas() {
+        List<MultaDTO> multas = multaService.listarTodos();
+        return ResponseEntity.ok(new ApiResponse<>(multas));
     }
 
-    // 3.Buscar por ID
-    @Operation(summary = "Buscando multa por ID")
+    // 3. Buscar por ID
+    @Operation(summary = "Busca uma multa por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<MultaDTO> buscarPorId(@PathVariable Long id) {
-        var multa = multaService.buscarPorId(id);
-        return ResponseEntity.ok(multaMapper.toDTO(multa));
+    public ResponseEntity<ApiResponse<MultaDTO>> buscarMultaPorId(@PathVariable Long id) {
+        MultaDTO multa = multaService.buscarPorId(id)
+            .orElseThrow(() -> new RuntimeException("Multa não encontrada com ID: " + id));
+        return ResponseEntity.ok(new ApiResponse<>(multa));
     }
 
-    // 4.Atualizar multa
+    // 4. Atualizar multa
+    @Operation(summary = "Atualiza os dados de uma multa")
     @PutMapping("/{id}")
-    @Operation(summary= "Atualiza as informações da multa")
-    public ResponseEntity<MultaDTO> atualizar(@PathVariable Long id, @RequestBody MultaDTO multaDTO) {
-        Multa multa = multaMapper.toEntity(multaDTO);
-        Multa atualizado = multaService.atualizar(id, multa);
-        return ResponseEntity.ok(multaMapper.toDTO(atualizado));
+    public ResponseEntity<ApiResponse<MultaDTO>> atualizarMulta(@PathVariable Long id, @Valid @RequestBody MultaDTO multaDTO) {
+        try {
+            MultaDTO multaAtualizada = multaService.atualizar(id, multaDTO);
+            return ResponseEntity.ok(new ApiResponse<>(multaAtualizada));
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse("Erro ao atualizar multa", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(error));
+        }
     }
- 
-    // 5.Deletar multa
-    @Operation(summary = "Deletar multa por ID")
+
+    // 5. Deletar multa
+    @Operation(summary = "Deleta uma multa por ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+    public ResponseEntity<Void> deletarMulta(@PathVariable Long id) {
         multaService.deletar(id);
         return ResponseEntity.noContent().build();
     }
-}
 
+    // 6. Listar por cliente (opcional)
+    @Operation(summary = "Lista todas as multas de um cliente")
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<ApiResponse<List<MultaDTO>>> listarMultasPorCliente(@PathVariable Long clienteId) {
+        List<MultaDTO> multasDoCliente = multaService.listarPorCliente(clienteId);
+        return ResponseEntity.ok(new ApiResponse<>(multasDoCliente));
+    }
+}
