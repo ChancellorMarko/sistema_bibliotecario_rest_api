@@ -41,8 +41,7 @@ public class EmprestimoService{
     }
 
     // Método para salvar
-    // Método para salvar
-   public EmprestimoDTO salvar(EmprestimoDTO emprestimoDTO) {
+    public EmprestimoDTO salvar(EmprestimoDTO emprestimoDTO) {
     // Buscando pelo cliente
     Cliente cliente = clienteRepository.findById(emprestimoDTO.getClienteId())
         .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
