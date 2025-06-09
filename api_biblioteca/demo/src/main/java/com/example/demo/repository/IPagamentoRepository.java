@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface IPagamentoRepository extends JpaRepository<Pagamento, Long> {
     List<Pagamento> findByClienteId(Long clienteId);
+    List<Pagamento> findByStatus(String status);
 }

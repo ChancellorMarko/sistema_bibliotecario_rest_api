@@ -24,6 +24,17 @@ public class PagamentoService {
     @Autowired
     private PagamentoMapper pagamentoMapper;
 
+    // Listar todos os pagamentos
+    public List<Pagamento> listarTodos() {
+        return pagamentoRepository.findAll();
+    }
+
+    // Buscar por ID
+    public Pagamento buscarPorId(Long id) {
+        return pagamentoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
+    }
+
     // Salvar entidade Pagamento diretamente
     public Pagamento salvar(Pagamento pagamento) {
         Cliente cliente = clienteRepository.findById(pagamento.getCliente().getId())
@@ -40,8 +51,12 @@ public class PagamentoService {
         Pagamento pagamento = pagamentoMapper.toEntity(pagamentoDTO);
         pagamento.setCliente(cliente);
 
-        pagamento.setDataPagamento(LocalDateTime.now());
+        // Se não tem data, usar a atual
+        if (pagamento.getDataPagamento() == null) {
+            pagamento.setDataPagamento(LocalDateTime.now());
+        }
 
+        // Se não tem status ou é inválido, usar PENDENTE
         String status = pagamento.getStatus();
         if (status == null || status.isBlank() || status.equalsIgnoreCase("string")) {
             pagamento.setStatus("PENDENTE");
@@ -49,6 +64,35 @@ public class PagamentoService {
 
         Pagamento pagamentoSalvo = salvar(pagamento);
         return pagamentoMapper.toDTO(pagamentoSalvo);
+    }
+
+    // Atualizar pagamento
+    public PagamentoDTO atualizar(PagamentoDTO pagamentoDTO) {
+        Pagamento pagamentoExistente = buscarPorId(pagamentoDTO.getId());
+        
+        Cliente cliente = clienteRepository.findById(pagamentoDTO.getClienteId())
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        // Atualizar campos
+        pagamentoExistente.setValor(pagamentoDTO.getValor());
+        pagamentoExistente.setFormaPagamento(pagamentoDTO.getFormaPagamento());
+        pagamentoExistente.setStatus(pagamentoDTO.getStatus());
+        pagamentoExistente.setDataPagamento(pagamentoDTO.getDataPagamento());
+        pagamentoExistente.setCliente(cliente);
+
+        Pagamento pagamentoAtualizado = pagamentoRepository.save(pagamentoExistente);
+        return pagamentoMapper.toDTO(pagamentoAtualizado);
+    }
+
+    // Deletar pagamento
+    public void deletar(Long id) {
+        Pagamento pagamento = buscarPorId(id);
+        pagamentoRepository.delete(pagamento);
+    }
+
+    // Listar por status
+    public List<Pagamento> listarPorStatus(String status) {
+        return pagamentoRepository.findByStatus(status);
     }
 
     public List<Pagamento> listarPorCliente(Long clienteId) {
