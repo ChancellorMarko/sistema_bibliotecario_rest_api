@@ -1,6 +1,30 @@
+// Variável para controlar edição
 let multaEditando = null
 
-// Remove a declaração duplicada - usa a variável global do config.js
+// Função para carregar multas do localStorage
+function carregarMultasDoStorage() {
+  const multasSalvas = localStorage.getItem("multasLocais")
+  if (multasSalvas) {
+    return JSON.parse(multasSalvas)
+  }
+  // Retorna array vazio se não houver nada salvo
+  return []
+}
+
+// Função para salvar multas no localStorage
+function salvarMultasNoStorage(multas) {
+  localStorage.setItem("multasLocais", JSON.stringify(multas))
+}
+
+// Função para obter próximo ID
+function obterProximoId(multas) {
+  if (multas.length === 0) return 1
+  return Math.max(...multas.map((m) => m.id)) + 1
+}
+
+// Array para armazenar as multas localmente
+const multasLocais = carregarMultasDoStorage()
+let proximoId = obterProximoId(multasLocais)
 
 document.addEventListener("DOMContentLoaded", () => {
   // Definir data padrão como 30 dias a partir de hoje
@@ -10,6 +34,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Submit do formulário
   document.getElementById("multaForm").addEventListener("submit", salvarMulta)
+
+  // Tornar funções acessíveis globalmente
+  window.listarTodasMultas = listarTodasMultas
+  window.buscarMulta = buscarMulta
+  window.editarMulta = editarMulta
+  window.excluirMulta = excluirMulta
+  window.limparFormulario = limparFormulario
 })
 
 async function salvarMulta(event) {
@@ -29,20 +60,21 @@ async function salvarMulta(event) {
     let response
     if (multaEditando) {
       // Atualizar multa existente
-      response = await apiRequest(`${API_BASE_URL}/api/multas/${multaEditando}`, {
+      response = await apiRequest(`http://localhost:8080/api/multas/${multaEditando}`, {
         method: "PUT",
         body: JSON.stringify(multaData),
       })
     } else {
       // Criar nova multa
-      response = await apiRequest(`${API_BASE_URL}/api/multas`, {
+      response = await apiRequest(`http://localhost:8080/api/multas`, {
         method: "POST",
         body: JSON.stringify(multaData),
       })
     }
 
     if (response) {
-      showAlert(multaEditando ? "Multa atualizada com sucesso!" : "Multa criada com sucesso!", "success")
+      const mensagem = multaEditando ? "Multa atualizada com sucesso!" : `Multa criada com sucesso! ID: ${response.id}`
+      showAlert(mensagem, "success")
       limparFormulario()
 
       // Atualizar lista se estiver visível
@@ -58,7 +90,7 @@ async function salvarMulta(event) {
 
 async function listarTodasMultas() {
   try {
-    const response = await apiRequest(`${API_BASE_URL}/api/multas`)
+    const response = await apiRequest(`http://localhost:8080/api/multas`)
 
     if (response && Array.isArray(response)) {
       exibirListaMultas(response, "Todas as Multas")
@@ -81,7 +113,7 @@ async function buscarMulta() {
   }
 
   try {
-    const response = await apiRequest(`${API_BASE_URL}/api/multas/${id}`)
+    const response = await apiRequest(`http://localhost:8080/api/multas/${id}`)
 
     if (response) {
       exibirDadosMulta(response)
@@ -158,7 +190,7 @@ function editarMulta(id) {
 
 async function buscarMultaParaEdicao(id) {
   try {
-    const response = await apiRequest(`${API_BASE_URL}/api/multas/${id}`)
+    const response = await apiRequest(`http://localhost:8080/api/multas/${id}`)
 
     if (response) {
       const multa = response
@@ -191,11 +223,12 @@ async function excluirMulta(id) {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/multas/${id}`, {
+    // Usar apiRequest em vez de fetch diretamente
+    const response = await apiRequest(`http://localhost:8080/api/multas/${id}`, {
       method: "DELETE",
     })
 
-    if (response.ok) {
+    if (response !== null) {
       showAlert("Multa excluída com sucesso!", "success")
 
       // Atualizar lista se estiver visível
@@ -245,72 +278,52 @@ function limparFormulario() {
 
 // Funções auxiliares (simulações, ajuste conforme necessário)
 async function apiRequest(url, options = {}) {
-  // Simulação de chamada à API (substitua pela lógica real)
   console.log("API Request:", url, options)
   const method = options.method || "GET"
 
-  // Simulação de diferentes respostas
-  if (url.includes("/api/multas/1") && method === "GET") {
-    return {
-      id: 1,
-      clienteId: 123,
-      emprestimoId: 456,
-      valor: 50.0,
-      dataVencimento: "2024-03-15",
-      status: "PENDENTE",
-      motivo: "Atraso na devolução",
-    }
-  }
-
+  // Listar todas as multas
   if (url.includes("/api/multas") && method === "GET" && !url.includes("/api/multas/")) {
-    return [
-      {
-        id: 1,
-        clienteId: 123,
-        emprestimoId: 456,
-        valor: 50.0,
-        dataVencimento: "2024-03-15",
-        status: "PENDENTE",
-        motivo: "Atraso na devolução",
-      },
-      {
-        id: 2,
-        clienteId: 789,
-        emprestimoId: 101,
-        valor: 25.5,
-        dataVencimento: "2024-03-20",
-        status: "PAGA",
-        motivo: null,
-      },
-    ]
+    return multasLocais
   }
 
+  // Buscar multa por ID
+  if (url.includes("/api/multas/") && method === "GET") {
+    const id = Number.parseInt(url.split("/").pop())
+    return multasLocais.find((multa) => multa.id === id) || null
+  }
+
+  // Criar nova multa
   if (url.includes("/api/multas") && method === "POST") {
-    return {
-      id: 3,
-      clienteId: 112,
-      emprestimoId: 131,
-      valor: 100.0,
-      dataVencimento: "2024-04-20",
-      status: "PENDENTE",
-      motivo: "Livro danificado",
-    }
+    const novaMulta = JSON.parse(options.body)
+    novaMulta.id = proximoId++
+    multasLocais.push(novaMulta)
+    salvarMultasNoStorage(multasLocais) // Salvar no localStorage
+    return novaMulta
   }
 
-  if (url.includes("/api/multas/1") && method === "PUT") {
-    return {
-      id: 1,
-      clienteId: 999,
-      emprestimoId: 888,
-      valor: 75.0,
-      dataVencimento: "2024-03-15",
-      status: "PAGA",
-      motivo: "Atraso na devolução",
+  // Atualizar multa
+  if (url.includes("/api/multas/") && method === "PUT") {
+    const id = Number.parseInt(url.split("/").pop())
+    const dadosAtualizados = JSON.parse(options.body)
+    const index = multasLocais.findIndex((multa) => multa.id === id)
+    if (index !== -1) {
+      multasLocais[index] = { ...multasLocais[index], ...dadosAtualizados }
+      salvarMultasNoStorage(multasLocais) // Salvar no localStorage
+      return multasLocais[index]
     }
+    return null
   }
 
-  if (url.includes("/api/multas/1") && method === "DELETE") {
-    return {}
+  // Deletar multa
+  if (url.includes("/api/multas/") && method === "DELETE") {
+    const id = Number.parseInt(url.split("/").pop())
+    const index = multasLocais.findIndex((multa) => multa.id === id)
+    if (index !== -1) {
+      multasLocais.splice(index, 1)
+      salvarMultasNoStorage(multasLocais) // Salvar no localStorage
+      return {} // Retorna objeto vazio para indicar sucesso
+    }
+    return null // Retorna null para indicar erro
   }
 
   return null
