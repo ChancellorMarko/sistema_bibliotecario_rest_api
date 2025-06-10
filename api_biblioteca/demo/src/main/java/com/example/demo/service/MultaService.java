@@ -3,7 +3,6 @@ package com.example.demo.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +15,7 @@ import com.example.demo.repository.IClienteRepository;
 import com.example.demo.repository.ILivroRepository;
 import com.example.demo.repository.IMultaRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class MultaService {
 
     @Autowired
@@ -43,17 +39,20 @@ public class MultaService {
     public MultaDTO salvar(MultaDTO multaDTO) {
         // Buscar cliente
         Cliente cliente = clienteRepository.findById(multaDTO.getClienteId())
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com ID: " + multaDTO.getClienteId()));
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado com ID: " + multaDTO.getClienteId()));
 
         // Buscar livro
         Livro livro = livroRepository.findById(multaDTO.getLivroId())
-                .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado com ID: " + multaDTO.getLivroId()));
+                .orElseThrow(() -> new RuntimeException("Livro não encontrado com ID: " + multaDTO.getLivroId()));
 
-        // Mapear DTO para entidade
-        Multa multa = multaMapper.toEntity(multaDTO);
+        // Criar multa
+        Multa multa = new Multa();
         multa.setCliente(cliente);
         multa.setLivro(livro);
-        multa.setStatus("PENDENTE");
+        multa.setValor(multaDTO.getValorMulta());
+        multa.setDataMulta(multaDTO.getDataMulta());
+        multa.setStatus(multaDTO.getStatus() != null ? multaDTO.getStatus() : "PENDENTE");
+        multa.setDataPagamento(multaDTO.getDataPagamento());
 
         // Salvar e retornar DTO
         return multaMapper.toDTO(multaRepository.save(multa));
@@ -62,11 +61,12 @@ public class MultaService {
     // Atualizar multa
     public MultaDTO atualizar(Long id, MultaDTO multaDTO) {
         Multa multaExistente = multaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Multa não encontrada com ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Multa não encontrada com ID: " + id));
 
         multaExistente.setValor(multaDTO.getValorMulta());
         multaExistente.setDataMulta(multaDTO.getDataMulta());
         multaExistente.setStatus(multaDTO.getStatus());
+        multaExistente.setDataPagamento(multaDTO.getDataPagamento());
 
         return multaMapper.toDTO(multaRepository.save(multaExistente));
     }
@@ -74,7 +74,7 @@ public class MultaService {
     // Deletar multa
     public void deletar(Long id) {
         Multa multa = multaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Multa não encontrada com ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Multa não encontrada com ID: " + id));
         multaRepository.delete(multa);
     }
 
@@ -83,11 +83,16 @@ public class MultaService {
         return multaMapper.toDTOList(multaRepository.findAll());
     }
 
-    // Listar multas por cliente (caso deseje)
+    // Listar multas por cliente
     public List<MultaDTO> listarPorCliente(Long clienteId) {
         Cliente cliente = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com ID: " + clienteId));
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado com ID: " + clienteId));
 
         return multaMapper.toDTOList(multaRepository.findByClienteId(clienteId));
+    }
+
+    // Listar multas por status
+    public List<MultaDTO> listarPorStatus(String status) {
+        return multaMapper.toDTOList(multaRepository.findByStatus(status));
     }
 }

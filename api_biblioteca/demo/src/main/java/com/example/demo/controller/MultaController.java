@@ -8,7 +8,6 @@ import com.example.demo.service.Utils.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,10 +19,9 @@ import java.util.List;
 @Tag(name = "Multas", description = "Endpoints para gerenciamento de multas")
 @RestController
 @RequestMapping("/api/multas")
-@RequiredArgsConstructor
 public class MultaController {
 
-      @Autowired
+    @Autowired
     private MultaService multaService;
 
     // 1. Criar multa
@@ -52,14 +50,15 @@ public class MultaController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<MultaDTO>> buscarMultaPorId(@PathVariable Long id) {
         MultaDTO multa = multaService.buscarPorId(id)
-            .orElseThrow(() -> new RuntimeException("Multa não encontrada com ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Multa não encontrada com ID: " + id));
         return ResponseEntity.ok(new ApiResponse<>(multa));
     }
 
     // 4. Atualizar multa
     @Operation(summary = "Atualiza os dados de uma multa")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<MultaDTO>> atualizarMulta(@PathVariable Long id, @Valid @RequestBody MultaDTO multaDTO) {
+    public ResponseEntity<ApiResponse<MultaDTO>> atualizarMulta(@PathVariable Long id,
+            @Valid @RequestBody MultaDTO multaDTO) {
         try {
             MultaDTO multaAtualizada = multaService.atualizar(id, multaDTO);
             return ResponseEntity.ok(new ApiResponse<>(multaAtualizada));
@@ -77,11 +76,19 @@ public class MultaController {
         return ResponseEntity.noContent().build();
     }
 
-    // 6. Listar por cliente (opcional)
+    // 6. Listar por cliente
     @Operation(summary = "Lista todas as multas de um cliente")
     @GetMapping("/cliente/{clienteId}")
     public ResponseEntity<ApiResponse<List<MultaDTO>>> listarMultasPorCliente(@PathVariable Long clienteId) {
         List<MultaDTO> multasDoCliente = multaService.listarPorCliente(clienteId);
         return ResponseEntity.ok(new ApiResponse<>(multasDoCliente));
+    }
+
+    // 7. Listar por status
+    @Operation(summary = "Lista multas por status")
+    @GetMapping("/status/{status}")
+    public ResponseEntity<ApiResponse<List<MultaDTO>>> listarMultasPorStatus(@PathVariable String status) {
+        List<MultaDTO> multasPorStatus = multaService.listarPorStatus(status);
+        return ResponseEntity.ok(new ApiResponse<>(multasPorStatus));
     }
 }
