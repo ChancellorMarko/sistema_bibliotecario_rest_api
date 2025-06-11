@@ -1,31 +1,6 @@
 // Variável para controlar edição
 let multaEditando = null
 
-// Função para carregar multas do localStorage
-function carregarMultasDoStorage() {
-  const multasSalvas = localStorage.getItem("multasLocais")
-  if (multasSalvas) {
-    return JSON.parse(multasSalvas)
-  }
-  // Retorna array vazio se não houver nada salvo
-  return []
-}
-
-// Função para salvar multas no localStorage
-function salvarMultasNoStorage(multas) {
-  localStorage.setItem("multasLocais", JSON.stringify(multas))
-}
-
-// Função para obter próximo ID
-function obterProximoId(multas) {
-  if (multas.length === 0) return 1
-  return Math.max(...multas.map((m) => m.id)) + 1
-}
-
-// Array para armazenar as multas localmente
-const multasLocais = carregarMultasDoStorage()
-let proximoId = obterProximoId(multasLocais)
-
 document.addEventListener("DOMContentLoaded", () => {
   // Definir data padrão como 30 dias a partir de hoje
   const dataVencimento = new Date()
@@ -51,9 +26,8 @@ async function salvarMulta(event) {
     clienteId: Number.parseInt(formData.get("clienteId")),
     emprestimoId: Number.parseInt(formData.get("emprestimoId")),
     valor: Number.parseFloat(formData.get("valor")),
-    dataVencimento: formData.get("dataVencimento"),
-    status: formData.get("status"),
-    motivo: formData.get("motivo"),
+    dataMulta: new Date().toISOString(), // Data atual da multa
+    motivo: formData.get("motivo") || null,
   }
 
   try {
@@ -84,7 +58,7 @@ async function salvarMulta(event) {
     }
   } catch (error) {
     console.error("Erro ao salvar multa:", error)
-    showAlert("Erro ao salvar multa", "error")
+    showAlert("Erro ao salvar multa: " + error.message, "error")
   }
 }
 
@@ -137,26 +111,23 @@ function exibirListaMultas(multas, titulo) {
   tabela.innerHTML = ""
 
   // Atualizar título
-  container.querySelector("h3").textContent = `⚠️ ${titulo}`
+  container.querySelector("h3").innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${titulo}`
 
   // Preencher tabela
   multas.forEach((multa) => {
     const row = tabela.insertRow()
-    const statusClass = getMultaStatusClass(multa.status)
-
     row.innerHTML = `
-            <td>${multa.id}</td>
-            <td>${multa.clienteId}</td>
-            <td>${multa.emprestimoId}</td>
-            <td>${formatCurrency(multa.valor)}</td>
-            <td>${formatDate(multa.dataVencimento)}</td>
-            <td><span class="status ${statusClass}">${multa.status}</span></td>
-            <td>${multa.motivo || "-"}</td>
-            <td class="actions">
-                <button class="btn btn-warning btn-sm" onclick="editarMulta(${multa.id})">Editar</button>
-                <button class="btn btn-danger btn-sm" onclick="excluirMulta(${multa.id})">Excluir</button>
-            </td>
-        `
+        <td>${multa.id}</td>
+        <td>${multa.clienteId}</td>
+        <td>${multa.emprestimoId}</td>
+        <td>${formatCurrency(multa.valor)}</td>
+        <td>${formatDate(multa.dataMulta)}</td>
+        <td>${multa.motivo || "-"}</td>
+        <td class="table-actions">
+            <button class="btn btn-warning btn-sm" onclick="editarMulta(${multa.id})">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="excluirMulta(${multa.id})">Excluir</button>
+        </td>
+    `
   })
 
   container.style.display = "block"
@@ -171,8 +142,7 @@ function exibirDadosMulta(multa) {
             <p><strong>Cliente ID:</strong> ${multa.clienteId}</p>
             <p><strong>Empréstimo ID:</strong> ${multa.emprestimoId}</p>
             <p><strong>Valor:</strong> ${formatCurrency(multa.valor)}</p>
-            <p><strong>Data de Vencimento:</strong> ${formatDate(multa.dataVencimento)}</p>
-            <p><strong>Status:</strong> <span class="status ${getMultaStatusClass(multa.status)}">${multa.status}</span></p>
+            <p><strong>Data da Multa:</strong> ${formatDate(multa.dataMulta)}</p>
             <p><strong>Motivo:</strong> ${multa.motivo || "-"}</p>
             <div class="actions" style="margin-top: 1rem;">
                 <button class="btn btn-warning btn-sm" onclick="editarMulta(${multa.id})">Editar</button>
@@ -199,13 +169,12 @@ async function buscarMultaParaEdicao(id) {
       document.getElementById("clienteId").value = multa.clienteId
       document.getElementById("emprestimoId").value = multa.emprestimoId
       document.getElementById("valor").value = multa.valor
-      document.getElementById("dataVencimento").value = multa.dataVencimento
-      document.getElementById("status").value = multa.status
+      document.getElementById("dataVencimento").value = multa.dataMulta ? multa.dataMulta.split("T")[0] : ""
       document.getElementById("motivo").value = multa.motivo || ""
 
       // Alterar estado do formulário para edição
       multaEditando = id
-      document.getElementById("btnSubmit").textContent = "Atualizar Multa"
+      document.getElementById("btnSubmit").innerHTML = '<i class="fas fa-edit"></i> Atualizar Multa'
       document.getElementById("btnCancelar").style.display = "inline-block"
 
       // Scroll para o formulário
@@ -276,71 +245,96 @@ function limparFormulario() {
   document.getElementById("dataVencimento").value = dataVencimento.toISOString().split("T")[0]
 }
 
-// Funções auxiliares (simulações, ajuste conforme necessário)
+// Função para fazer requisições reais à API
 async function apiRequest(url, options = {}) {
-  console.log("API Request:", url, options)
-  const method = options.method || "GET"
-
-  // Listar todas as multas
-  if (url.includes("/api/multas") && method === "GET" && !url.includes("/api/multas/")) {
-    return multasLocais
-  }
-
-  // Buscar multa por ID
-  if (url.includes("/api/multas/") && method === "GET") {
-    const id = Number.parseInt(url.split("/").pop())
-    return multasLocais.find((multa) => multa.id === id) || null
-  }
-
-  // Criar nova multa
-  if (url.includes("/api/multas") && method === "POST") {
-    const novaMulta = JSON.parse(options.body)
-    novaMulta.id = proximoId++
-    multasLocais.push(novaMulta)
-    salvarMultasNoStorage(multasLocais) // Salvar no localStorage
-    return novaMulta
-  }
-
-  // Atualizar multa
-  if (url.includes("/api/multas/") && method === "PUT") {
-    const id = Number.parseInt(url.split("/").pop())
-    const dadosAtualizados = JSON.parse(options.body)
-    const index = multasLocais.findIndex((multa) => multa.id === id)
-    if (index !== -1) {
-      multasLocais[index] = { ...multasLocais[index], ...dadosAtualizados }
-      salvarMultasNoStorage(multasLocais) // Salvar no localStorage
-      return multasLocais[index]
+  try {
+    const defaultOptions = {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
     }
-    return null
-  }
 
-  // Deletar multa
-  if (url.includes("/api/multas/") && method === "DELETE") {
-    const id = Number.parseInt(url.split("/").pop())
-    const index = multasLocais.findIndex((multa) => multa.id === id)
-    if (index !== -1) {
-      multasLocais.splice(index, 1)
-      salvarMultasNoStorage(multasLocais) // Salvar no localStorage
+    const config = { ...defaultOptions, ...options }
+
+    console.log("Fazendo requisição para:", url, config)
+
+    const response = await fetch(url, config)
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null // Retorna null para 404 (não encontrado)
+      }
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    // Para DELETE, pode não ter conteúdo
+    if (response.status === 204 || options.method === "DELETE") {
       return {} // Retorna objeto vazio para indicar sucesso
     }
-    return null // Retorna null para indicar erro
+
+    const data = await response.json()
+
+    // Se a resposta tem formato ApiResponse, extrair os dados
+    if (data.success !== undefined) {
+      return data.success ? data.data : null
+    }
+
+    return data
+  } catch (error) {
+    console.error("Erro na requisição:", error)
+    throw error
   }
-
-  return null
 }
 
+// Função para exibir alertas reais
 function showAlert(message, type) {
-  // Simulação de alerta (substitua pela lógica real)
-  alert(`${type.toUpperCase()}: ${message}`)
+  // Criar elemento de alerta
+  const alertDiv = document.createElement("div")
+  alertDiv.className = `alert alert-${type}`
+  alertDiv.innerHTML = `
+    <i class="fas fa-${getAlertIcon(type)}"></i>
+    ${message}
+  `
+
+  // Inserir no topo do main-content
+  const mainContent = document.querySelector(".main-content")
+  mainContent.insertBefore(alertDiv, mainContent.firstChild)
+
+  // Remover após 5 segundos
+  setTimeout(() => {
+    if (alertDiv.parentNode) {
+      alertDiv.parentNode.removeChild(alertDiv)
+    }
+  }, 5000)
 }
 
+function getAlertIcon(type) {
+  switch (type) {
+    case "success":
+      return "check-circle"
+    case "error":
+      return "exclamation-circle"
+    case "warning":
+      return "exclamation-triangle"
+    case "info":
+      return "info-circle"
+    default:
+      return "info-circle"
+  }
+}
+
+// Função para formatar moeda
 function formatCurrency(value) {
-  // Simulação de formatação de moeda (substitua pela lógica real)
-  return `R$ ${value.toFixed(2)}`
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value)
 }
 
+// Função para formatar data
 function formatDate(dateString) {
-  // Simulação de formatação de data (substitua pela lógica real)
+  if (!dateString) return "-"
   const date = new Date(dateString)
   return date.toLocaleDateString("pt-BR")
 }

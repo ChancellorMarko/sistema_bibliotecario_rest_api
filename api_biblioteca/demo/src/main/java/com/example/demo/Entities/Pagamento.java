@@ -25,7 +25,7 @@ public class Pagamento {
     @Column(name = "data_pagamento", nullable = false)
     private LocalDateTime dataPagamento;
 
-    @Column(name = "metodo_pagamento", nullable = false)
+    @Column(name = "forma_pagamento", nullable = false)
     private String metodoPagamento; // PIX, DINHEIRO, CARTAO_CREDITO, etc.
 
     @Column(nullable = false)

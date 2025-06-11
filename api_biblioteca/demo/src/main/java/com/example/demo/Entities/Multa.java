@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Multa")
+@Table(name = "multa")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,14 +32,11 @@ public class Multa {
     private Cliente cliente;
 
     @ManyToOne
-    @JoinColumn(name = "livro_id", nullable = false)
-    private Livro livro;
+    @JoinColumn(name = "emprestimo_id", nullable = false)
+    private Emprestimo emprestimo;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal valor;
-
-    @Column(nullable = false)
-    private String status;
 
     @Column(nullable = false)
     private LocalDateTime dataMulta;
