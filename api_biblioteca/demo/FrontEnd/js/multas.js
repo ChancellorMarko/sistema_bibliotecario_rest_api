@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.editarMulta = editarMulta
   window.excluirMulta = excluirMulta
   window.limparFormulario = limparFormulario
+  window.listarTodasMultasIncluindoPagas = listarTodasMultasIncluindoPagas
 })
 
 async function salvarMulta(event) {
@@ -64,10 +65,45 @@ async function salvarMulta(event) {
 
 async function listarTodasMultas() {
   try {
+    // Buscar todas as multas
+    const multasResponse = await apiRequest(`http://localhost:8080/api/multas`)
+
+    if (multasResponse && Array.isArray(multasResponse)) {
+      // Buscar todos os pagamentos processados
+      const pagamentosResponse = await apiRequest(`http://localhost:8080/api/pagamentos/status/PROCESSADO`)
+      const pagamentosProcessados = pagamentosResponse || []
+
+      // Criar lista de IDs de multas que foram pagas
+      const multasPagas = pagamentosProcessados.map((pagamento) => pagamento.multaId)
+
+      // Filtrar apenas multas que NÃO foram pagas
+      const multasPendentes = multasResponse.filter((multa) => !multasPagas.includes(multa.id))
+
+      if (multasPendentes.length > 0) {
+        exibirListaMultas(multasPendentes, "Multas Pendentes")
+        document.getElementById("resultadoBusca").style.display = "none"
+      } else {
+        showAlert("Nenhuma multa pendente encontrada", "info")
+        // Limpar tabela se não houver multas
+        const tabela = document.getElementById("tabelaMultas").getElementsByTagName("tbody")[0]
+        tabela.innerHTML = ""
+        document.getElementById("listaMultas").style.display = "block"
+      }
+    } else {
+      showAlert("Nenhuma multa encontrada", "info")
+    }
+  } catch (error) {
+    console.error("Erro ao listar multas:", error)
+    showAlert("Erro ao carregar lista de multas", "error")
+  }
+}
+
+async function listarTodasMultasIncluindoPagas() {
+  try {
     const response = await apiRequest(`http://localhost:8080/api/multas`)
 
     if (response && Array.isArray(response)) {
-      exibirListaMultas(response, "Todas as Multas")
+      exibirListaMultas(response, "Todas as Multas (Incluindo Pagas)")
       document.getElementById("resultadoBusca").style.display = "none"
     } else {
       showAlert("Nenhuma multa encontrada", "info")
