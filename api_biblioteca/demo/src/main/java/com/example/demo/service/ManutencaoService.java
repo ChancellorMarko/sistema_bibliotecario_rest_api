@@ -22,6 +22,10 @@ public class ManutencaoService {
         Livro livro = livroRepository.findById(manutencao.getLivro().getId())
                 .orElseThrow(() -> new RuntimeException("Livro não encontrado"));
         manutencao.setLivro(livro);
+
+        // Diminuir quantidade de livros
+        livro.setQuantidade(livro.getQuantidade() - 1);
+
         return manutencaoRepository.save(manutencao);
     }
 
@@ -38,6 +42,14 @@ public class ManutencaoService {
                 .orElseThrow(() -> new RuntimeException("Manutenção não encontrada"));
         manutencao.setStatus("Concluída");
         manutencao.setDataFim(java.time.LocalDateTime.now());
+
+        // Liberar o livro que não foi devolvido
+        if (!"CONCLUIDO".equals(manutencao.getStatus())) {
+            Livro livro = manutencao.getLivro();
+            livro.setQuantidade(livro.getQuantidade() + 1);
+            livroRepository.save(livro);
+        }
+
         return manutencaoRepository.save(manutencao);
     }
 }
