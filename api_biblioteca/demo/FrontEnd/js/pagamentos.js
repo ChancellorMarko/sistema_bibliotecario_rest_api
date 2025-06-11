@@ -33,6 +33,29 @@ async function buscarMulta() {
   console.log("Buscando multa com ID:", multaId)
 
   try {
+    // Primeiro, verificar se já existe pagamento processado para esta multa
+    const responsePagamentos = await fetch(`${API_BASE_URL}/pagamentos`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+
+    if (responsePagamentos.ok) {
+      const resultPagamentos = await responsePagamentos.json()
+      const todosPagamentos = Array.isArray(resultPagamentos) ? resultPagamentos : resultPagamentos.data || []
+
+      // Verificar se existe pagamento processado para esta multa
+      const pagamentoProcessado = todosPagamentos.find((p) => p.multaId == multaId && p.status === "PROCESSADO")
+
+      if (pagamentoProcessado) {
+        showAlert(`Esta multa já foi paga! Pagamento ID: ${pagamentoProcessado.id}`, "warning")
+        return
+      }
+    }
+
+    // Se não foi paga, buscar a multa normalmente
     const response = await fetch(`${API_BASE_URL}/multas/${multaId}`, {
       method: "GET",
       headers: {
@@ -180,7 +203,7 @@ async function criarPagamento(pagamento) {
   }
 }
 
-// Função para listar todos os pagamentos
+// Função para listar todos os pagamentos (apenas pendentes)
 async function listarTodosPagamentos() {
   try {
     const response = await fetch(`${API_BASE_URL}/pagamentos`, {
@@ -195,8 +218,35 @@ async function listarTodosPagamentos() {
     }
 
     const data = await response.json()
+    const todosPagamentos = Array.isArray(data) ? data : data.data || []
+
+    // Filtrar apenas pagamentos pendentes
+    const pagamentosPendentes = todosPagamentos.filter((p) => p.status !== "PROCESSADO")
+
+    exibirListaPagamentos(pagamentosPendentes, "Pagamentos Pendentes")
+  } catch (error) {
+    console.error("Erro ao listar pagamentos:", error)
+    showAlert(`Erro ao carregar pagamentos: ${error.message}`, "error")
+  }
+}
+
+// Nova função para listar TODOS os pagamentos (incluindo processados)
+async function listarTodosPagamentosIncluindoProcessados() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/pagamentos`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Erro HTTP: ${response.status}`)
+    }
+
+    const data = await response.json()
     const pagamentos = Array.isArray(data) ? data : data.data || []
-    exibirListaPagamentos(pagamentos, "Todos os Pagamentos")
+    exibirListaPagamentos(pagamentos, "Todos os Pagamentos (Incluindo Processados)")
   } catch (error) {
     console.error("Erro ao listar pagamentos:", error)
     showAlert(`Erro ao carregar pagamentos: ${error.message}`, "error")
